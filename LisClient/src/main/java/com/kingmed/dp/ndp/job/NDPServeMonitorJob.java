@@ -9,7 +9,6 @@
 import com.kingmed.dp.ndp.NDPServe;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
-import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.PersistJobDataAfterExecution;
@@ -23,7 +22,7 @@ import org.slf4j.LoggerFactory;
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
 public class NDPServeMonitorJob implements Job{
-    private static final Logger log =LoggerFactory.getLogger(NDPServeMonitorJob);
+    private static final Logger log =LoggerFactory.getLogger(NDPServeMonitorJob.class);
     private NDPServe ndpServe;
 
     public void setNdpServe(NDPServe ndpServe) {

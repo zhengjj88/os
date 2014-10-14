@@ -81,7 +81,6 @@ public class NDPCommunicator extends DefaultCommunicator {
                 log.error("关闭http连接出错", e);
             }
         }
-        return null;
     }
 
 }
