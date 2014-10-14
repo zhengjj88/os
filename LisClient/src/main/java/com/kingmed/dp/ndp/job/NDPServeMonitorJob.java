@@ -3,8 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-
+package com.kingmed.dp.ndp.job;
 
 import com.kingmed.dp.ndp.NDPServe;
 import org.quartz.DisallowConcurrentExecution;
@@ -21,30 +20,31 @@ import org.slf4j.LoggerFactory;
  */
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
-public class NDPServeMonitorJob implements Job{
-    private static final Logger log =LoggerFactory.getLogger(NDPServeMonitorJob.class);
+public class NDPServeMonitorJob implements Job {
+
+    private static final Logger log = LoggerFactory.getLogger(NDPServeMonitorJob.class);
     private NDPServe ndpServe;
 
     public void setNdpServe(NDPServe ndpServe) {
         this.ndpServe = ndpServe;
     }
-    
+
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
-        
-    //JobDataMap data = context.getJobDetail().getJobDataMap();
+
+        //JobDataMap data = context.getJobDetail().getJobDataMap();
         //String urlForUpdateLinkedFolders = ndpServe.getUrlForUpdateLinkedFolders(Long.MIN_VALUE);
         log.info("登录");
-        
+
         log.info("检测登录是否成功");
-        
+
         log.info("如果登录成功，提取cookie;如果登陆失败，记录错误日志，重试3次之后，则报警");
-        
+
         log.info("更新文件夹");
-        
+
         log.info("注销");
-        
+
         log.info("如果注销成功，则返回;如果注销失败，记录错误日志，重试3次之后，则报警");
     }
-    
+
 }
