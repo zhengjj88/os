@@ -48,8 +48,8 @@ public class NDPServe1Test {
     
     @Test
     public void testSignin(){
-        UsernamePasswordToken token = new UsernamePasswordToken("kingtest", "ittest");
-        Subject subject = SecurityUtils.getSubject();   
-        System.out.println("subject======================="+subject);
+        //UsernamePasswordToken token = new UsernamePasswordToken("kingtest", "ittest");
+        //Subject subject = SecurityUtils.getSubject();   
+        System.out.println("subject=======================");
     }
 }

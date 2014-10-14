@@ -6,6 +6,7 @@
 package com.kingmed.dp.ndp.job;
 
 import com.kingmed.dp.ndp.NDPServe;
+import java.util.logging.Level;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -35,7 +36,11 @@ public class NDPServeMonitorJob implements Job {
         //JobDataMap data = context.getJobDetail().getJobDataMap();
         //String urlForUpdateLinkedFolders = ndpServe.getUrlForUpdateLinkedFolders(Long.MIN_VALUE);
         log.info("登录");
-
+        try {
+            Thread.sleep(10*1000L);
+        } catch (InterruptedException ex) {
+            java.util.logging.Logger.getLogger(NDPServeMonitorJob.class.getName()).log(Level.SEVERE, null, ex);
+        }
         log.info("检测登录是否成功");
 
         log.info("如果登录成功，提取cookie;如果登陆失败，记录错误日志，重试3次之后，则报警");
