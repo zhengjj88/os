@@ -6,7 +6,12 @@
 package com.kingmed.dp.ndp.job;
 
 import com.kingmed.dp.ndp.NDPServe;
+import com.kingmed.dp.ndp.impl.NDPServeResponseHandler;
+import com.kingmed.dp.ndp.impl.SignInResponseHandler;
 import java.util.logging.Level;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -14,6 +19,7 @@ import org.quartz.JobExecutionException;
 import org.quartz.PersistJobDataAfterExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 /**
  *
@@ -50,6 +56,19 @@ public class NDPServeMonitorJob implements Job {
         log.info("注销");
 
         log.info("如果注销成功，则返回;如果注销失败，记录错误日志，重试3次之后，则报警");
+    }
+    
+    public void testSignIn(){
+        String signinUrl = ndpServe.getUrlSignin();
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        NDPServeResponseHandler responeHandler = new SignInResponseHandler();
+        try {
+            HttpGet httpget = new HttpGet(signinUrl);
+            httpclient.execute(httpget, responeHandler);
+            String cookie = responeHandler.getCookie();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

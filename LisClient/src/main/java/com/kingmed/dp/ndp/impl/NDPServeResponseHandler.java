@@ -67,6 +67,16 @@ public class NDPServeResponseHandler implements ResponseHandler<String> {
         return cookie;
     }
     
+    /**
+     * 处理NDP.serve返回的数据，如XML
+     * @param responseBody
+     * @return true :
+     *          NDP.serve处理请求成功,
+     *          <br/>
+     *          false :
+     *          NDP.serve 处理请求失败
+     * @throws Exception 
+     */
     public String checkStatus(String responseBody) throws Exception{
         String connectinStatus = null;
         Reader reader = new StringReader(responseBody);
