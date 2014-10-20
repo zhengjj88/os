@@ -8,7 +8,6 @@ package com.kingmed.dp.ndp.job;
 import com.kingmed.dp.ndp.NDPServe;
 import com.kingmed.dp.ndp.impl.NDPServeResponseHandler;
 import com.kingmed.dp.ndp.impl.SignInResponseHandler;
-import java.util.logging.Level;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -19,7 +18,6 @@ import org.quartz.JobExecutionException;
 import org.quartz.PersistJobDataAfterExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 /**
  *
@@ -42,7 +40,8 @@ public class NDPServeMonitorJob implements Job {
         //JobDataMap data = context.getJobDetail().getJobDataMap();
         //String urlForUpdateLinkedFolders = ndpServe.getUrlForUpdateLinkedFolders(Long.MIN_VALUE);
         log.info("登录");
-
+        String urlSignIn = ndpServe.getUrlSignin();
+        
         log.info("检测登录是否成功");
 
         log.info("如果登录成功，提取cookie;如果登陆失败，记录错误日志，重试3次之后，则报警");
@@ -54,7 +53,7 @@ public class NDPServeMonitorJob implements Job {
         log.info("如果注销成功，则返回;如果注销失败，记录错误日志，重试3次之后，则报警");
     }
     
-    public void testSignIn(){
+    public void signIn(){
         String signinUrl = ndpServe.getUrlSignin();
         CloseableHttpClient httpclient = HttpClients.createDefault();
         NDPServeResponseHandler responeHandler = new SignInResponseHandler();

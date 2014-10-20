@@ -5,23 +5,13 @@
  */
 package com.kingmed.dp.ndp.impl;
 
-import com.google.common.base.Strings;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.List;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.util.EntityUtils;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.filter.Filters;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,47 +48,12 @@ public class NDPServeResponseHandler implements ResponseHandler<String> {
         return responseBody;
     }
 
-    
-    private void setCookie(String cookie){
+    private void setCookie(String cookie) {
         this.cookie = cookie;
     }
-    
+
     public String getCookie() {
         return cookie;
-    }
-    
-    /**
-     * 处理NDP.serve返回的数据，如XML
-     * @param responseBody
-     * @return true :
-     *          NDP.serve处理请求成功,
-     *          <br/>
-     *          false :
-     *          NDP.serve 处理请求失败
-     * @throws Exception 
-     */
-    public String checkStatus(String responseBody) throws Exception{
-        String connectinStatus = null;
-        Reader reader = new StringReader(responseBody);
-        SAXBuilder builder = new SAXBuilder();
-        Document jdomDoc = null;
-        try {
-            jdomDoc = builder.build(reader);
-        } catch (Exception e) {
-            log.error("返回结果出错", e);
-        }
-        XPathFactory xFactory = XPathFactory.instance();
-        XPathExpression<Element> expr = xFactory.compile("//connection/status", Filters.element());
-        List<Element> items = expr.evaluate(jdomDoc);
-        for (Element itemElement : items) {
-            connectinStatus = itemElement.getText();
-            log.info("connectin Status=" + connectinStatus);
-            if (connectinStatus.equals("succeeded")) {
-                log.info("请求成功，connection status =["+connectinStatus+"]");
-                break;
-            }
-        }
-        return connectinStatus;
     }
 
 }

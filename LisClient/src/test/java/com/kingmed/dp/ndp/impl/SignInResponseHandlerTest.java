@@ -39,10 +39,10 @@ public class SignInResponseHandlerTest {
     public void setUp() {
         ndpServe = new NDPImageServerImpl();
         ndpServe.setProtocl("http");
-        ndpServe.setHost("www.kingmed.com.cn");
-        ndpServe.setPort(81);
-        ndpServe.setUsername("upmcportal");
-        ndpServe.setPassword("upmcportalking");
+        ndpServe.setHost("192.168.0.45");
+        ndpServe.setPort(80);
+        ndpServe.setUsername("upmc-test");
+        ndpServe.setPassword("123456-1");
     }
 
     @After
