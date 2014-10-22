@@ -164,7 +164,7 @@ public class NDPServeTest {
     @Test
     public void testQueryItemsAddedAfterWithCookie(){
         Long itemId=43701L;//KM14-000556_S100_3_KM140559   42947
-        String cookie="SessionID=7e0280f201cf4490a8ec4d8ba5da83ce";
+        String cookie="SessionID=6ae0aee80592439e974f7e7ec4fe00cd";
         String queryUrl = ndpServe.getUrlItemsAddedAfter(itemId);
         System.out.println("queryUrl is "+queryUrl);
         CloseableHttpClient client = HttpClients.createDefault();

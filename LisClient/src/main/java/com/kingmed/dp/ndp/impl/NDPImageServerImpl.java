@@ -13,11 +13,12 @@ import com.kingmed.dp.ndp.NDPServe;
  */
 public class NDPImageServerImpl implements NDPServe {
     public static final String CONNECTION="connection";
-    public static final String CONNECTION_STATUS="status";
-    public static final String CONNECTION_STATUS_SUCCEEDED="succeeded";
+    public static final String STATUS="status";
+    public static final String STATUS_SUCCEEDED="succeeded";
     public static final String CONNECTION_STATUS_USERNAME="username";
     public static final String CONNECTION_STATUS_FAILED="failed";
     public static final String CONNECTION_STATUS_MESSAGE="message";
+    public static final String UPDATERESULT="updateresult";
     
     private String username;
     private String password;

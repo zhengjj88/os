@@ -42,7 +42,7 @@ public class SignInResponseHandlerTest {
         ndpServe.setHost("192.168.0.45");
         ndpServe.setPort(80);
         ndpServe.setUsername("upmc-test");
-        ndpServe.setPassword("123456-1");
+        ndpServe.setPassword("123456");
     }
 
     @After
@@ -59,8 +59,7 @@ public class SignInResponseHandlerTest {
         NDPServeResponseHandler responeHandler = new SignInResponseHandler();
         try {
             HttpGet httpget = new HttpGet(signinUrl);
-            httpclient.execute(httpget, responeHandler);
-            String cookie = responeHandler.getCookie();
+            String cookie =httpclient.execute(httpget, responeHandler);
             Assert.notNull(cookie);
         } catch (Exception e) {
             e.printStackTrace();

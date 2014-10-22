@@ -34,18 +34,21 @@ public class SignInResponseHandler extends NDPServeResponseHandler {
     public String handleResponse(HttpResponse hr) throws ClientProtocolException, IOException {
         String responseBody = null;
         String connectionStatus = null;
+        String cookie = null;
         try {
             responseBody = super.handleResponse(hr);
             connectionStatus = checkStatus(responseBody);
-            if (Strings.isNullOrEmpty(connectionStatus) || !connectionStatus.equals("succeeded")) {
+            //检测是否登陆成功
+            if (Strings.isNullOrEmpty(connectionStatus) || !connectionStatus.equals(NDPImageServerImpl.STATUS_SUCCEEDED)) {
                 log.error("认证失败");
                 throw new IOException("认证失败");
             }
-        } catch (Exception ex) {
-            log.error("认证失败", ex);
-            throw new IOException(ex);
+        } catch (Exception e) {
+            log.error("认证失败", e);
+            throw new IOException(e);
         }
-        return responseBody;
+        cookie = getCookie();
+        return cookie;
     }
 
     /**
@@ -59,27 +62,18 @@ public class SignInResponseHandler extends NDPServeResponseHandler {
      */
     private String checkStatus(String responseBody) throws Exception {
         String status = null;
+        String expression = "//" + NDPImageServerImpl.CONNECTION;
+        List<Element> items = null;
         String username;
         String message;
-        Reader reader = new StringReader(responseBody);
-        SAXBuilder builder = new SAXBuilder();
-        Document jdomDoc = null;
-        try {
-            jdomDoc = builder.build(reader);
-        } catch (Exception e) {
-            log.error("返回结果出错", e);
-            return status;
-        }
-        XPathFactory xFactory = XPathFactory.instance();
-        XPathExpression<Element> expr = xFactory.compile("//" + NDPImageServerImpl.CONNECTION, Filters.element());
-        List<Element> items = expr.evaluate(jdomDoc);
-
+        
+        items = checkStatus(responseBody, expression);
         for (Element itemElement : items) {
-            status = itemElement.getChildText(NDPImageServerImpl.CONNECTION_STATUS);
+            status = itemElement.getChildText(NDPImageServerImpl.STATUS);
             message = itemElement.getChildText(NDPImageServerImpl.CONNECTION_STATUS_MESSAGE);
             username = itemElement.getChildText(NDPImageServerImpl.CONNECTION_STATUS_USERNAME);
             log.info("connectin Status=" + status + ",message=" + message + ",username=" + username);
-            if (NDPImageServerImpl.CONNECTION_STATUS_SUCCEEDED.equals(status)) {
+            if (NDPImageServerImpl.STATUS_SUCCEEDED.equals(status)) {
                 break;
             }
         }
