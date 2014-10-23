@@ -41,9 +41,9 @@ public class SignOutResponseHandlerTest {
         ndpServe = new NDPImageServerImpl();
         ndpServe.setProtocl("http");
         ndpServe.setHost("www.kingmed.com.cn");
-        ndpServe.setPort(81);
-        ndpServe.setUsername("upmcportal");
-        ndpServe.setPassword("upmcportalking");
+        ndpServe.setPort(7090);
+        ndpServe.setUsername("upmc-test");
+        ndpServe.setPassword("123456");
     }
 
     @After

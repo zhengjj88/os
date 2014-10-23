@@ -59,12 +59,13 @@ public class NDPServeTest {
     @Before
     public void setUp() {
         System.out.println("@Before");
+        
         ndpServe = new NDPImageServerImpl();
         ndpServe.setProtocl("http");
         ndpServe.setHost("www.kingmed.com.cn");
-        ndpServe.setPort(81);
-        ndpServe.setUsername("upmcportal");
-        ndpServe.setPassword("upmcportalking");
+        ndpServe.setPort(7090);
+        ndpServe.setUsername("upmc-test");
+        ndpServe.setPassword("123456");
     }
 
     @After
@@ -164,7 +165,7 @@ public class NDPServeTest {
     @Test
     public void testQueryItemsAddedAfterWithCookie(){
         Long itemId=43701L;//KM14-000556_S100_3_KM140559   42947
-        String cookie="SessionID=6ae0aee80592439e974f7e7ec4fe00cd";
+        String cookie="SessionID=6868fe54487b4591a297624af7e19c5d";
         String queryUrl = ndpServe.getUrlItemsAddedAfter(itemId);
         System.out.println("queryUrl is "+queryUrl);
         CloseableHttpClient client = HttpClients.createDefault();
