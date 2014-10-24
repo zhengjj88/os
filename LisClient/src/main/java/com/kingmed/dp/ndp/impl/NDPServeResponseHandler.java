@@ -51,9 +51,6 @@ public class NDPServeResponseHandler implements ResponseHandler<String> {
             HttpEntity entity = hr.getEntity();
             responseBody = (entity != null ? EntityUtils.toString(entity) : null);
             log.info("请求，结果\r\n" + responseBody);
-        } else {
-            log.error("请求失败");
-            throw new ClientProtocolException("Unexpected response status: " + status);
         }
         return responseBody;
     }

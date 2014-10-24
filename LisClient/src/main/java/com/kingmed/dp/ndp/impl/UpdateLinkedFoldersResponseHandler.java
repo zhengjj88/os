@@ -7,17 +7,11 @@ package com.kingmed.dp.ndp.impl;
 
 import com.google.common.base.Strings;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.List;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.filter.Filters;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
+import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +29,10 @@ public class UpdateLinkedFoldersResponseHandler extends NDPServeResponseHandler{
         String status = null;
         try {
             responseBody = super.handleResponse(hr);
+            if(responseBody == null){
+                log.warn("更新文件夹，返回内容为空");
+                return status;
+            }
             status = checkStatus(responseBody);
             //检测是否登陆成功
             if (Strings.isNullOrEmpty(status) || !status.equals(NDPImageServerImpl.STATUS_SUCCEEDED)) {
@@ -56,14 +54,18 @@ public class UpdateLinkedFoldersResponseHandler extends NDPServeResponseHandler{
      * false : NDP.serve 处理请求失败
      * @throws Exception
      */
-    private String checkStatus(String responseBody) throws Exception {
+    private String checkStatus(String responseBody) throws JDOMException, IOException{
         String status = null;
         String expression = "//" + NDPImageServerImpl.UPDATERESULT;
         List<Element> items = null;
         items = checkStatus(responseBody, expression);
+        if(items==null){
+            log.warn("更新文件夹，状态字为空");
+            return status;
+        }
         for (Element itemElement : items) {
             status = itemElement.getChildText(NDPImageServerImpl.STATUS);
-            log.info("updateresult Status=" + status);
+            log.info("更新文件夹，Status=" + status);
             if (NDPImageServerImpl.STATUS_SUCCEEDED.equals(status)) {
                 break;
             }
