@@ -64,8 +64,8 @@ public class NDPServeTest {
         ndpServe.setProtocl("http");
         ndpServe.setHost("www.kingmed.com.cn");
         ndpServe.setPort(7090);
-        ndpServe.setUsername("upmc-test");
-        ndpServe.setPassword("123456");
+        ndpServe.setUsername("");
+        ndpServe.setPassword("");
     }
 
     @After
@@ -165,7 +165,7 @@ public class NDPServeTest {
     @Test
     public void testQueryItemsAddedAfterWithCookie(){
         Long itemId=43701L;//KM14-000556_S100_3_KM140559   42947
-        String cookie="SessionID=e02b9b9c7d674425871a6cc5fe565735";
+        String cookie="SessionID=fcd7e67c483e443d84dcfb719d4e630e";
         String queryUrl = ndpServe.getUrlItemsAddedAfter(itemId);
         System.out.println("queryUrl is "+queryUrl);
         CloseableHttpClient client = HttpClients.createDefault();

@@ -23,11 +23,11 @@ import org.springframework.util.Assert;
  *
  * @author zhengjunjie
  */
-public class SignOutResponseHandlerTest {
+public class UpdateLinkedFolderResponseHandlerTest {
 
     private NDPImageServerImpl ndpServe;
 
-    public SignOutResponseHandlerTest() {
+    public UpdateLinkedFolderResponseHandlerTest() {
     }
 
     @BeforeClass
@@ -56,12 +56,12 @@ public class SignOutResponseHandlerTest {
     // The methods must be annotated with annotation @Test. For example:
     //
     @Test
-    public void testSignOut() {
+    public void testUpdateLinkedFolder() {
+
         String signinUrl = ndpServe.getUrlSignin();
-        String signOutUrl =ndpServe.getUrlSignout();
         CloseableHttpClient httpclient = HttpClients.createDefault();
         NDPServeResponseHandler responeHandler = new SignInResponseHandler();
-        String cookie =null;
+        String cookie = null;
         try {
             HttpGet httpget = new HttpGet(signinUrl);
             httpclient.execute(httpget, responeHandler);
@@ -70,31 +70,34 @@ public class SignOutResponseHandlerTest {
         } catch (Exception e) {
             e.printStackTrace();
             fail("认证失败");
-        }finally{
+        } finally {
             try {
                 httpclient.close();
             } catch (IOException ex) {
                 fail("关闭连接失败");
             }
         }
-        
-        Header header = new BasicHeader("Cookie",cookie);
+
+        String uri = ndpServe.getUrlForUpdateLinkedFolders(88L);
         httpclient = HttpClients.createDefault();
-        responeHandler = new SignOutResponseHandler();
+        responeHandler = new SignInResponseHandler();
+
         try {
-            HttpGet httpget = new HttpGet(signOutUrl);
-            httpget.setHeader(header.getName(),header.getValue());
+            HttpGet httpget = new HttpGet(uri);
+            httpget.setHeader("Cookie", cookie);
             httpclient.execute(httpget, responeHandler);
+            cookie = responeHandler.getCookie();
+            Assert.notNull(cookie);
         } catch (Exception e) {
             e.printStackTrace();
-            fail("注销失败");
-        }finally{
+            fail("更新失败");
+        } finally {
             try {
                 httpclient.close();
             } catch (IOException ex) {
                 fail("关闭连接失败");
             }
         }
-        
+
     }
 }

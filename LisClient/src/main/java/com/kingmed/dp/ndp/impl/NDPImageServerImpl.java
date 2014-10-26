@@ -145,6 +145,7 @@ public class NDPImageServerImpl implements NDPServe {
 
     @Override
     public String getUrlForUpdateLinkedFolders(Long itemId) {
-        return "nspUpdateLinkedFolders?ItemID="+itemId;
+        String u= "nspUpdateLinkedFolders?ItemID="+itemId;
+        return getCompleteUrl(u);
     }
 }

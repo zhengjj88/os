@@ -6,9 +6,6 @@
 package com.kingmed.ndp;
 
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
