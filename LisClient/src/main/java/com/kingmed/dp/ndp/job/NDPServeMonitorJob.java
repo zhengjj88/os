@@ -42,7 +42,7 @@ public class NDPServeMonitorJob implements Job {
 
     private static final Logger log = LoggerFactory.getLogger(NDPServeMonitorJob.class);
     private NDPServe ndpServe;
-    private Long linkedFolerItemId = 9999999L;
+    private Long linkedFolerItemId = 130L;
 
     public void setNdpServe(NDPServe ndpServe) {
         this.ndpServe = ndpServe;
@@ -57,7 +57,7 @@ public class NDPServeMonitorJob implements Job {
             ndpServe = new NDPImageServerImpl();
             ndpServe.setProtocl("http");
             ndpServe.setHost("www.kingmed.com.cn");
-            ndpServe.setPort(7090);
+            ndpServe.setPort(81);
             ndpServe.setUsername("");
             ndpServe.setPassword("");
         }
@@ -65,7 +65,6 @@ public class NDPServeMonitorJob implements Job {
     }
 
     public Long getLinkedFolerItemId() {
-        linkedFolerItemId = 88L;
         return linkedFolerItemId;
     }
 
