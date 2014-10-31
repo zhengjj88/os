@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
  */
 public class SignOutResponseHandlerTest {
 
-    private NDPImageServerImpl ndpServe;
+    private NDPServeImpl ndpServe;
 
     public SignOutResponseHandlerTest() {
     }
@@ -40,12 +40,7 @@ public class SignOutResponseHandlerTest {
 
     @Before
     public void setUp() {
-        ndpServe = new NDPImageServerImpl();
-        ndpServe.setProtocl("http");
-        ndpServe.setHost("www.kingmed.com.cn");
-        ndpServe.setPort(7090);
-        ndpServe.setUsername("");
-        ndpServe.setPassword("");
+        ndpServe = NDPServeFactory.getNDPServe();
     }
 
     @After
@@ -84,7 +79,8 @@ public class SignOutResponseHandlerTest {
         try {
             HttpGet httpget = new HttpGet(signOutUrl);
             httpget.setHeader(header.getName(),header.getValue());
-            httpclient.execute(httpget, responeHandler);
+            String status = httpclient.execute(httpget, responeHandler);
+            assertTrue("注销成功", NDPServeImpl.STATUS_SUCCEEDED.equals(status));
         } catch (Exception e) {
             e.printStackTrace();
             fail("注销失败");

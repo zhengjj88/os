@@ -35,7 +35,7 @@ public class UpdateLinkedFoldersResponseHandler extends NDPServeResponseHandler{
             }
             status = checkStatus(responseBody);
             //检测是否登陆成功
-            if (Strings.isNullOrEmpty(status) || !status.equals(NDPImageServerImpl.STATUS_SUCCEEDED)) {
+            if (Strings.isNullOrEmpty(status) || !status.equals(NDPServeImpl.STATUS_SUCCEEDED)) {
                 log.error("更新失败");
             }
         } catch (Exception e) {
@@ -56,7 +56,7 @@ public class UpdateLinkedFoldersResponseHandler extends NDPServeResponseHandler{
      */
     private String checkStatus(String responseBody) throws JDOMException, IOException{
         String status = null;
-        String expression = "//" + NDPImageServerImpl.UPDATERESULT;
+        String expression = "//" + NDPServeImpl.UPDATERESULT;
         List<Element> items = null;
         items = checkStatus(responseBody, expression);
         if(items==null){
@@ -64,9 +64,9 @@ public class UpdateLinkedFoldersResponseHandler extends NDPServeResponseHandler{
             return status;
         }
         for (Element itemElement : items) {
-            status = itemElement.getChildText(NDPImageServerImpl.STATUS);
+            status = itemElement.getChildText(NDPServeImpl.STATUS);
             log.info("更新文件夹，Status=" + status);
-            if (NDPImageServerImpl.STATUS_SUCCEEDED.equals(status)) {
+            if (NDPServeImpl.STATUS_SUCCEEDED.equals(status)) {
                 break;
             }
             //如果没有登录，服务器返回500代码

@@ -100,7 +100,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.kingmed.dp.ndp.job.scheduler.QuartzNDPServeMonitorScheduler</mainClass>
+                            <mainClass>com.kingmed.dp.ndp.job.scheduler.Bootstrap</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

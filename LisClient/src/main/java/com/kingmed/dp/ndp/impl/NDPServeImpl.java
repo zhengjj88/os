@@ -11,7 +11,7 @@ import com.kingmed.dp.ndp.NDPServe;
  *
  * @author zhengjunjie
  */
-public class NDPImageServerImpl implements NDPServe {
+public class NDPServeImpl implements NDPServe {
     public static final String CONNECTION="connection";
     public static final String STATUS="status";
     public static final String STATUS_SUCCEEDED="succeeded";

@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
  */
 public class SignInResponseHandlerTest {
 
-    private NDPImageServerImpl ndpServe;
+    private NDPServeImpl ndpServe;
 
     public SignInResponseHandlerTest() {
     }
@@ -37,12 +37,7 @@ public class SignInResponseHandlerTest {
 
     @Before
     public void setUp() {
-        ndpServe = new NDPImageServerImpl();
-        ndpServe.setProtocl("http");
-        ndpServe.setHost("www.kingmed.com.cn");
-        ndpServe.setPort(7090);
-        ndpServe.setUsername("");
-        ndpServe.setPassword("");
+        ndpServe = NDPServeFactory.getNDPServe();
     }
 
     @After

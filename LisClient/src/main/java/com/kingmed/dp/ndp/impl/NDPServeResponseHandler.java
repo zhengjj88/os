@@ -38,7 +38,10 @@ public class NDPServeResponseHandler implements ResponseHandler<String> {
     public String handleResponse(HttpResponse hr) throws ClientProtocolException, IOException {
         String responseBody = null;
         int status = hr.getStatusLine().getStatusCode();
-        log.info("请求，状态字：" + status);
+        HttpEntity entity = hr.getEntity();
+        responseBody = (entity != null ? EntityUtils.toString(entity) : null);
+        log.info("请求，状态字：" + status+"\r\n请求，结果\r\n[" + responseBody+"]");
+        
         if (status >= 200 && status < 300) {
             Header[] cookies = hr.getHeaders("Set-Cookie");
             for (Header c : cookies) {
@@ -48,9 +51,9 @@ public class NDPServeResponseHandler implements ResponseHandler<String> {
                     log.info("cookie=[" + cookie + "]");
                 }
             }
-            HttpEntity entity = hr.getEntity();
-            responseBody = (entity != null ? EntityUtils.toString(entity) : null);
-            log.info("请求，结果\r\n" + responseBody);
+//            HttpEntity entity = hr.getEntity();
+//            responseBody = (entity != null ? EntityUtils.toString(entity) : null);
+//            log.info("请求，结果\r\n" + responseBody);
         }
         return responseBody;
     }

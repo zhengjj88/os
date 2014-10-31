@@ -5,7 +5,7 @@
  */
 package com.kingmed.dp.ndp;
 
-import com.kingmed.dp.ndp.impl.NDPImageServerImpl;
+import com.kingmed.dp.ndp.impl.NDPServeImpl;
 import com.kingmed.dp.connection.ConnectionManager;
 import java.io.IOException;
 import org.apache.http.HttpEntity;
@@ -23,7 +23,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class NDPConnectionManager implements ConnectionManager {
 
-    private NDPImageServerImpl ndpServe;
+    private NDPServeImpl ndpServe;
 
     @Override
     public void connect() throws Exception {

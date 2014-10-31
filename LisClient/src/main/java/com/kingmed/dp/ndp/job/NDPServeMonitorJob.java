@@ -6,8 +6,10 @@
 package com.kingmed.dp.ndp.job;
 
 import com.google.common.base.Strings;
+import com.kingmed.dp.ndp.Constants;
 import com.kingmed.dp.ndp.NDPServe;
-import com.kingmed.dp.ndp.impl.NDPImageServerImpl;
+import com.kingmed.dp.ndp.impl.NDPServeFactory;
+import com.kingmed.dp.ndp.impl.NDPServeImpl;
 import com.kingmed.dp.ndp.impl.NDPServeResponseHandler;
 import com.kingmed.dp.ndp.impl.SignInResponseHandler;
 import com.kingmed.dp.ndp.impl.SignOutResponseHandler;
@@ -42,7 +44,7 @@ public class NDPServeMonitorJob implements Job {
 
     private static final Logger log = LoggerFactory.getLogger(NDPServeMonitorJob.class);
     private NDPServe ndpServe;
-    private Long linkedFolerItemId = 130L;
+    private Long linkedFolerItemId = Constants.LINKED_FOLDERS_ITEMID;
 
     public void setNdpServe(NDPServe ndpServe) {
         this.ndpServe = ndpServe;
@@ -54,12 +56,7 @@ public class NDPServeMonitorJob implements Job {
 
     public NDPServe getNdpServe() {
         if(ndpServe == null){
-            ndpServe = new NDPImageServerImpl();
-            ndpServe.setProtocl("http");
-            ndpServe.setHost("www.kingmed.com.cn");
-            ndpServe.setPort(81);
-            ndpServe.setUsername("");
-            ndpServe.setPassword("");
+            ndpServe = NDPServeFactory.getNDPServe();
         }
         return ndpServe;
     }
@@ -88,7 +85,7 @@ public class NDPServeMonitorJob implements Job {
                     
                     log.info("更新文件夹");
                     updateStatus = this.updateLinkedFolders(cookie.trim(), getLinkedFolerItemId());
-                    if(updateStatus!=null&&NDPImageServerImpl.STATUS_SUCCEEDED.equals(updateStatus)){
+                    if(updateStatus!=null&&NDPServeImpl.STATUS_SUCCEEDED.equals(updateStatus)){
                         log.info("更新文件夹成功,ItemId="+this.linkedFolerItemId);
                     }else{
                         log.warn("更新文件夹失败,ItemId="+this.linkedFolerItemId);

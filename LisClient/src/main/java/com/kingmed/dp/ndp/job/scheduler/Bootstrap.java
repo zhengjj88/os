@@ -22,15 +22,24 @@ import org.slf4j.LoggerFactory;
  *
  * @author zhengjunjie
  */
-public class QuartzNDPServeMonitorScheduler {
+public class Bootstrap {
     
-    private static final Logger log = LoggerFactory.getLogger(QuartzNDPServeMonitorScheduler.class);
-    
-    public static void main(String[] args) {
-        log.info("start up.................................");
+    private static final Logger log = LoggerFactory.getLogger(Bootstrap.class);
+    private Scheduler sched;
+
+    public Bootstrap() {
         SchedulerFactory sf = new StdSchedulerFactory();
         try {
-            Scheduler sched = sf.getScheduler();
+            sched = sf.getScheduler();
+        } catch (SchedulerException e) {
+            log.error("初始化调度器出错，退出",e);
+            System.exit(1);
+        }
+    }
+    
+    private void statrup(){
+        log.info("任务开始.................................");
+        try {
             JobDetail job = newJob(NDPServeMonitorJob.class)
                     .withIdentity("job1", "group1")
                     .build();
@@ -41,8 +50,13 @@ public class QuartzNDPServeMonitorScheduler {
             sched.scheduleJob(job, trigger);
             sched.start();
            // sched.shutdown(true);
-        } catch (SchedulerException ex) {
-            ex.printStackTrace();
+        } catch (SchedulerException e) {
+            log.error("调度任务运行出错",e);
         }
+    }
+    
+    public static void main(String[] args) {
+        Bootstrap bootstrap = new Bootstrap();
+        bootstrap.statrup();
     }
 }

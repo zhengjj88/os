@@ -39,7 +39,7 @@ public class SignInResponseHandler extends NDPServeResponseHandler {
             responseBody = super.handleResponse(hr);
             connectionStatus = checkStatus(responseBody);
             //检测是否登陆成功
-            if (Strings.isNullOrEmpty(connectionStatus) || !connectionStatus.equals(NDPImageServerImpl.STATUS_SUCCEEDED)) {
+            if (Strings.isNullOrEmpty(connectionStatus) || !connectionStatus.equals(NDPServeImpl.STATUS_SUCCEEDED)) {
                 log.error("认证失败");
                 throw new IOException("认证失败");
             }
@@ -48,6 +48,7 @@ public class SignInResponseHandler extends NDPServeResponseHandler {
             throw new IOException(e);
         }
         cookie = getCookie();
+        log.info("cookie is ["+cookie+"]");
         return cookie;
     }
 
@@ -62,18 +63,18 @@ public class SignInResponseHandler extends NDPServeResponseHandler {
      */
     private String checkStatus(String responseBody) throws Exception {
         String status = null;
-        String expression = "//" + NDPImageServerImpl.CONNECTION;
+        String expression = "//" + NDPServeImpl.CONNECTION;
         List<Element> items = null;
         String username;
         String message;
         
         items = checkStatus(responseBody, expression);
         for (Element itemElement : items) {
-            status = itemElement.getChildText(NDPImageServerImpl.STATUS);
-            message = itemElement.getChildText(NDPImageServerImpl.CONNECTION_STATUS_MESSAGE);
-            username = itemElement.getChildText(NDPImageServerImpl.CONNECTION_STATUS_USERNAME);
+            status = itemElement.getChildText(NDPServeImpl.STATUS);
+            message = itemElement.getChildText(NDPServeImpl.CONNECTION_STATUS_MESSAGE);
+            username = itemElement.getChildText(NDPServeImpl.CONNECTION_STATUS_USERNAME);
             log.info("connectin Status=" + status + ",message=" + message + ",username=" + username);
-            if (NDPImageServerImpl.STATUS_SUCCEEDED.equals(status)) {
+            if (NDPServeImpl.STATUS_SUCCEEDED.equals(status)) {
                 break;
             }
         }

@@ -5,6 +5,7 @@
  */
 package com.kingmed.dp.ndp.impl;
 
+import com.kingmed.dp.ndp.Constants;
 import java.io.IOException;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpGet;
@@ -25,7 +26,7 @@ import org.springframework.util.Assert;
  */
 public class UpdateLinkedFolderResponseHandlerTest {
 
-    private NDPImageServerImpl ndpServe;
+    private NDPServeImpl ndpServe;
 
     public UpdateLinkedFolderResponseHandlerTest() {
     }
@@ -40,12 +41,7 @@ public class UpdateLinkedFolderResponseHandlerTest {
 
     @Before
     public void setUp() {
-        ndpServe = new NDPImageServerImpl();
-        ndpServe.setProtocl("http");
-        ndpServe.setHost("www.kingmed.com.cn");
-        ndpServe.setPort(7090);
-        ndpServe.setUsername("");
-        ndpServe.setPassword("");
+        ndpServe = NDPServeFactory.getNDPServe();
     }
 
     @After
@@ -78,16 +74,16 @@ public class UpdateLinkedFolderResponseHandlerTest {
             }
         }
 
-        String uri = ndpServe.getUrlForUpdateLinkedFolders(88L);
+        String uri = ndpServe.getUrlForUpdateLinkedFolders(Constants.LINKED_FOLDERS_ITEMID);
         httpclient = HttpClients.createDefault();
-        responeHandler = new SignInResponseHandler();
+        responeHandler = new UpdateLinkedFoldersResponseHandler();
 
         try {
             HttpGet httpget = new HttpGet(uri);
             httpget.setHeader("Cookie", cookie);
-            httpclient.execute(httpget, responeHandler);
-            cookie = responeHandler.getCookie();
-            Assert.notNull(cookie);
+            String status = httpclient.execute(httpget, responeHandler);
+            System.out.println("status=================="+status);
+            assertTrue("连接状态应该是succeed", status.equals(NDPServeImpl.STATUS_SUCCEEDED));
         } catch (Exception e) {
             e.printStackTrace();
             fail("更新失败");
