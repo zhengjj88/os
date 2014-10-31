@@ -6,19 +6,11 @@
 package com.kingmed.dp.ndp.impl;
 
 import com.google.common.base.Strings;
-import com.kingmed.dp.ndp.NDPServe;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.List;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.filter.Filters;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.xpath.XPathExpression;
-import org.jdom2.xpath.XPathFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
