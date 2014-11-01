@@ -20,8 +20,8 @@ public class NDPServeFactory {
             ndpServe.setProtocl("http");
             ndpServe.setHost("www.kingmed.com.cn");
             ndpServe.setPort(81);
-            ndpServe.setUsername("upmcportal");
-            ndpServe.setPassword("upmcportalking");
+            ndpServe.setUsername("");
+            ndpServe.setPassword("");
         }
         return ndpServe;
     }
