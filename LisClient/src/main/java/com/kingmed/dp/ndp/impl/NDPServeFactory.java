@@ -5,8 +5,6 @@
  */
 package com.kingmed.dp.ndp.impl;
 
-import com.kingmed.dp.ndp.impl.NDPServeImpl;
-
 /**
  *
  * @author zhengjunjie

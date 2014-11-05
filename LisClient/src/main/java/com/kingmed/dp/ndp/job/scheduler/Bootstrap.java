@@ -38,14 +38,14 @@ public class Bootstrap {
     }
     
     private void statrup(){
-        log.info("任务开始.................................");
+        log.info("任务开始....");
         try {
             JobDetail job = newJob(NDPServeMonitorJob.class)
                     .withIdentity("job1", "group1")
                     .build();
             CronTrigger trigger = newTrigger()
                     .withIdentity("trigger2", "group1")
-                    .withSchedule(cronSchedule("0/3 * * * * ?"))
+                    .withSchedule(cronSchedule("0/15 * * * * ?"))
                     .build();
             sched.scheduleJob(job, trigger);
             sched.start();

@@ -5,7 +5,6 @@
  */
 package com.kingmed.dp.ndp.job;
 
-import com.google.common.base.Strings;
 import com.kingmed.dp.ndp.Constants;
 import com.kingmed.dp.ndp.NDPServe;
 import com.kingmed.dp.ndp.impl.NDPServeFactory;
@@ -15,12 +14,9 @@ import com.kingmed.dp.ndp.impl.SignInResponseHandler;
 import com.kingmed.dp.ndp.impl.SignOutResponseHandler;
 import com.kingmed.dp.ndp.impl.UpdateLinkedFoldersResponseHandler;
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.http.Header;
-import org.apache.http.HeaderElement;
-import org.apache.http.ParseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
