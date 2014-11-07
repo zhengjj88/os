@@ -5,6 +5,7 @@
  */
 package com.kingmed.dp.ndp.impl;
 
+import com.kingmed.dp.ndp.Constants;
 import com.kingmed.dp.ndp.NDPServe;
 
 /**
@@ -25,6 +26,8 @@ public class NDPServeImpl implements NDPServe {
     private String protocl = "http";
     private String host;
     private int port = 80;
+    //NDP.serve的根目录，目录必须是树形结构，必须有一个根目录
+    private Long rootLinkedFolderItemId=Constants.LINKED_FOLDERS_ITEMID;
 
     @Override
     public String getUsername() {
@@ -148,4 +151,14 @@ public class NDPServeImpl implements NDPServe {
         String u= "nspUpdateLinkedFolders?ItemID="+itemId;
         return getCompleteUrl(u);
     }
+
+    public Long getRootLinkedFolderItemId() {
+        return rootLinkedFolderItemId;
+    }
+
+    public void setRootLinkedFolderItemId(Long rootLinkedFolderItemId) {
+        this.rootLinkedFolderItemId = rootLinkedFolderItemId;
+    }
+    
+    
 }

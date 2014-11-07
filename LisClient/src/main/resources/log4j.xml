@@ -11,7 +11,7 @@
     </appender>
 
     <appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">  
-        <param name="File" value="f:/log4j1.log"/>  
+        <param name="File" value="e:/log4j1.log"/>  
         <param name="Append" value="false"/>
         <param name="MaxFileSize" value="100MB"/>
         <param name="MaxBackupIndex" value="2"/>
