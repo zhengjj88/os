@@ -43,18 +43,20 @@
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
-        <action>
-            <actionName>CUSTOM-assembly:assebmly</actionName>
-            <displayName>assembly:assebmly</displayName>
-            <goals>
-                <goal>assembly:assembly</goal>
-            </goals>
-        </action>
+        
         <action>
             <actionName>CUSTOM-test</actionName>
             <displayName>test</displayName>
             <goals>
                 <goal>test</goal>
+            </goals>
+        </action>
+        
+        <action>
+            <actionName>CUSTOM-package</actionName>
+            <displayName>package</displayName>
+            <goals>
+                <goal>package</goal>
             </goals>
         </action>
     </actions>

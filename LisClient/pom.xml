@@ -5,32 +5,53 @@
     <artifactId>ImageServerInspector</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <slf4j.version>1.7.7</slf4j.version>
+        <quartz.version>2.2.1</quartz.version>
+        <guava.version>18.0</guava.version>
+        <derby.version>10.11.1.1</derby.version>
+        <netty.version>4.0.23.Final</netty.version>
+        <httpclient.version>4.3.5</httpclient.version>
+        <junit.version>4.10</junit.version>
+        <jdom2.version>2.0.5</jdom2.version>
+        <jaxen.version>1.1.6</jaxen.version>
+        <spring.version>3.2.11.RELEASE</spring.version>
+        <shiro.version>1.2.3</shiro.version>
+        <hibernate.version>3.2.6.ga</hibernate.version>
+        <hibernate-annotations.version>3.2.1.ga</hibernate-annotations.version>
+        <mysql.version>5.1.32</mysql.version>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.0.23.Final</version>
+            <version>${netty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.3.5</version>
+            <version>${httpclient.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jdom</groupId>
             <artifactId>jdom2</artifactId>
-            <version>2.0.5</version>
+            <version>${jdom2.version}</version>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
-            <version>1.1.6</version>
+            <version>${jaxen.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.derby</groupId>
@@ -40,7 +61,12 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>3.2.11.RELEASE</version>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -60,23 +86,36 @@
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-core</artifactId>
-            <version>1.2.3</version>
+            <version>${shiro.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate</artifactId>
+            <version>${hibernate.version}</version>
+            <scope>compile</scope>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-annotations</artifactId>
+            <version>${hibernate-annotations.version}</version>
+            <scope>compile</scope>
+            <optional>false</optional>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <slf4j.version>1.7.7</slf4j.version>
-        <quartz.version>2.2.1</quartz.version>
-        <guava.version>18.0</guava.version>
-        <derby.version>10.11.1.1</derby.version>
-    </properties>
+    
     
     <build>
         <plugins>

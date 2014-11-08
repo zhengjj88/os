@@ -74,7 +74,7 @@ public class UpdateLinkedFolderResponseHandlerTest {
             }
         }
 
-        String uri = ndpServe.getUrlForUpdateLinkedFolders(Constants.LINKED_FOLDERS_ITEMID);
+        String uri = ndpServe.getUrlForUpdateLinkedFolders();
         httpclient = HttpClients.createDefault();
         responeHandler = new UpdateLinkedFoldersResponseHandler();
 

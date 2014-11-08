@@ -36,10 +36,9 @@ public interface NDPServe extends WebImageServer{
 
     /**
      * 
-     * @param itemId，文件夹的ID
      * @return，更新文件夹内容的URL
      */
-    String getUrlForUpdateLinkedFolders(Long itemId);
+    String getUrlForUpdateLinkedFolders();
     
     /**
      * 查询文件夹的元数据
@@ -51,4 +50,8 @@ public interface NDPServe extends WebImageServer{
      * @return url
      */
     String getUrlForItemInfo(Long itemId,int update);
+
+    Long getRootLinkedFolderItemId();
+
+    void setRootLinkedFolderItemId(Long rootLinkedFolderItemId);
 }

@@ -14,6 +14,7 @@ import com.kingmed.dp.ndp.impl.SignInResponseHandler;
 import com.kingmed.dp.ndp.impl.SignOutResponseHandler;
 import com.kingmed.dp.ndp.impl.UpdateLinkedFoldersResponseHandler;
 import java.io.IOException;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.http.Header;
@@ -39,31 +40,45 @@ import org.slf4j.LoggerFactory;
 public class NDPServeMonitorJob implements Job {
 
     private static final Logger log = LoggerFactory.getLogger(NDPServeMonitorJob.class);
-    private NDPServe ndpServe;
-    private Long linkedFolerItemId = Constants.LINKED_FOLDERS_ITEMID;
+    //private NDPServe ndpServe;
+    private Set<NDPServe> allNDPserves;
+    //private Long linkedFolerItemId = Constants.LINKED_FOLDERS_ITEMID;
 
+    public NDPServeMonitorJob() {
+        allNDPserves = NDPServeFactory.getAllNDPServes();
+    }
+
+   /*
     public void setNdpServe(NDPServe ndpServe) {
         this.ndpServe = ndpServe;
     }
+    */
 
-    public void setLinkedFolerItemId(Long linkedFolerItemId) {
-        this.linkedFolerItemId = linkedFolerItemId;
-    }
+//    public void setLinkedFolerItemId(Long linkedFolerItemId) {
+//        this.linkedFolerItemId = linkedFolerItemId;
+//    }
 
+    /*
     public NDPServe getNdpServe() {
-        if(ndpServe == null){
+        if (ndpServe == null) {
             ndpServe = NDPServeFactory.getNDPServe();
         }
         return ndpServe;
     }
+*/
+//    public Long getLinkedFolerItemId() {
+//        return linkedFolerItemId;
+//    }
 
-    public Long getLinkedFolerItemId() {
-        return linkedFolerItemId;
-    }
-
-    
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
+        for (NDPServe serve : allNDPserves) {
+            log.info("调用服务器"+serve.toString());
+            execute(serve);
+        }
+    }
+
+    private void execute(NDPServe serve) {
         String cookie = null;
         String updateStatus = null;
         int retryCounter = 3;
@@ -72,19 +87,19 @@ public class NDPServeMonitorJob implements Job {
         try {
             while (retryCounter > 0) {
                 log.info("登录");
-                cookie = this.signIn();
-                
+                cookie = this.signIn(serve);
+
                 log.info("检测登录是否成功");
                 boolean isValidCookie = this.isValidCookie(cookie);
                 if (isValidCookie) {
                     log.info("登录成功");
-                    
+
                     log.info("更新文件夹");
-                    updateStatus = this.updateLinkedFolders(cookie.trim(), getLinkedFolerItemId());
-                    if(updateStatus!=null&&NDPServeImpl.STATUS_SUCCEEDED.equals(updateStatus)){
-                        log.info("更新文件夹成功,ItemId="+this.linkedFolerItemId);
-                    }else{
-                        log.warn("更新文件夹失败,ItemId="+this.linkedFolerItemId);
+                    updateStatus = this.updateLinkedFolders(cookie.trim(),serve);
+                    if (updateStatus != null && NDPServeImpl.STATUS_SUCCEEDED.equals(updateStatus)) {
+                        log.info("更新文件夹成功,ItemId=" + serve.getRootLinkedFolderItemId());
+                    } else {
+                        log.warn("更新文件夹失败,ItemId=" + serve.getRootLinkedFolderItemId());
                     }
                     break;
                 } else {
@@ -94,25 +109,24 @@ public class NDPServeMonitorJob implements Job {
                 }
             }
         } catch (IOException e) {
-            log.error("NDPSereve文件夹监控失败"+getNdpServe().toString(),e);
+            log.error("NDPSereve文件夹监控失败" + serve.toString(), e);
         } finally {
-            if(cookie!=null){
+            if (cookie != null) {
                 log.info("注销");
                 try {
-                    this.signOut(cookie);
+                    this.signOut(cookie,serve);
                 } catch (IOException e) {
-                    log.error("注销失败"+getNdpServe().toString()+",cookie =" +cookie,e);
+                    log.error("注销失败" + serve.toString() + ",cookie =" + cookie, e);
                 }
             }
         }
-
     }
 
-    protected String signIn() throws IOException {
+    protected String signIn(NDPServe serve) throws IOException {
         String cookie = null;
-        String uri = getNdpServe().getUrlSignin();
+        String uri = serve.getUrlSignin();
         NDPServeResponseHandler responeHandler = new SignInResponseHandler();
-        cookie = this.execute(uri, responeHandler,null);
+        cookie = this.execute(uri, responeHandler, null);
         return cookie;
     }
 
@@ -124,45 +138,46 @@ public class NDPServeMonitorJob implements Job {
         re = m.matches();
         if (!re) {
             log.warn("无效cookie" + cookie);
-            this.signOut(cookie);
+            //this.signOut(cookie);
         }
         return re;
     }
 
-    protected String updateLinkedFolders(String cookie ,Long itemId) throws IOException {
+    protected String updateLinkedFolders(String cookie,NDPServe serve) throws IOException {
         String status = null;
-        String uri = getNdpServe().getUrlForUpdateLinkedFolders(itemId);
-        NDPServeResponseHandler responeHandler =  new UpdateLinkedFoldersResponseHandler();
+        String uri = serve.getUrlForUpdateLinkedFolders();
+        NDPServeResponseHandler responeHandler = new UpdateLinkedFoldersResponseHandler();
         Header header = new BasicHeader("Cookie", cookie);
-        status = execute(uri,responeHandler,header);
+        status = execute(uri, responeHandler, header);
         return status;
     }
-    
-    private String execute(String uri,ResponseHandler<String> responeHandler,Header header) throws IOException{
+
+    private String execute(String uri, ResponseHandler<String> responeHandler, Header header) throws IOException {
         String re = null;
         CloseableHttpClient httpClient = null;
         HttpGet httpGet = null;
-        
+
         httpClient = HttpClients.createDefault();
         httpGet = new HttpGet(uri);
-        if(header!=null){
+        if (header != null) {
             httpGet.setHeader(header.getName(), header.getValue());
         }
         try {
             re = httpClient.execute(httpGet, responeHandler);
         } finally {
-            if(httpClient!=null)
+            if (httpClient != null) {
                 httpClient.close();
+            }
         }
         return re;
     }
-    
-    protected String signOut(String cookie) throws IOException {
+
+    protected String signOut(String cookie,NDPServe serve) throws IOException {
         Header header = new BasicHeader("Cookie", cookie);
-        String uri = getNdpServe().getUrlSignout();
+        String uri = serve.getUrlSignout();
         NDPServeResponseHandler responeHandler = new SignOutResponseHandler();
-        String re = this.execute(uri, responeHandler,header);
-        log.info("注销\r\n"+re);
+        String re = this.execute(uri, responeHandler, header);
+        log.info("注销\r\n" + re);
         return cookie;
     }
 }

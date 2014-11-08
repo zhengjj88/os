@@ -13,21 +13,22 @@ import com.kingmed.dp.ndp.NDPServe;
  * @author zhengjunjie
  */
 public class NDPServeImpl implements NDPServe {
-    public static final String CONNECTION="connection";
-    public static final String STATUS="status";
-    public static final String STATUS_SUCCEEDED="succeeded";
-    public static final String CONNECTION_STATUS_USERNAME="username";
-    public static final String CONNECTION_STATUS_FAILED="failed";
-    public static final String CONNECTION_STATUS_MESSAGE="message";
-    public static final String UPDATERESULT="updateresult";
-    
+
+    public static final String CONNECTION = "connection";
+    public static final String STATUS = "status";
+    public static final String STATUS_SUCCEEDED = "succeeded";
+    public static final String CONNECTION_STATUS_USERNAME = "username";
+    public static final String CONNECTION_STATUS_FAILED = "failed";
+    public static final String CONNECTION_STATUS_MESSAGE = "message";
+    public static final String UPDATERESULT = "updateresult";
+
     private String username;
     private String password;
     private String protocl = "http";
     private String host;
     private int port = 80;
     //NDP.serve的根目录，目录必须是树形结构，必须有一个根目录
-    private Long rootLinkedFolderItemId=Constants.LINKED_FOLDERS_ITEMID;
+    private Long rootLinkedFolderItemId = Constants.LINKED_FOLDERS_ITEMID;
 
     @Override
     public String getUsername() {
@@ -143,22 +144,23 @@ public class NDPServeImpl implements NDPServe {
 
     @Override
     public String getUrlForItemInfo(Long itemId, int update) {
-        return "nspGetItemInfo?ItemID="+itemId+"&Update="+update;
+        return "nspGetItemInfo?ItemID=" + itemId + "&Update=" + update;
     }
 
     @Override
-    public String getUrlForUpdateLinkedFolders(Long itemId) {
-        String u= "nspUpdateLinkedFolders?ItemID="+itemId;
+    public String getUrlForUpdateLinkedFolders() {
+        String u = "nspUpdateLinkedFolders?ItemID=" + getRootLinkedFolderItemId();
         return getCompleteUrl(u);
     }
 
+    @Override
     public Long getRootLinkedFolderItemId() {
         return rootLinkedFolderItemId;
     }
 
+    @Override
     public void setRootLinkedFolderItemId(Long rootLinkedFolderItemId) {
         this.rootLinkedFolderItemId = rootLinkedFolderItemId;
     }
-    
-    
+
 }
