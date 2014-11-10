@@ -11,6 +11,9 @@ package com.kingmed.dp.entity;
  */
 public class SysProperty {
     private Long id;
-    private String code;
+    private String section;//配置块
+    private String code;//属性代码
     private String value;
+    private String remark;
+    
 }
