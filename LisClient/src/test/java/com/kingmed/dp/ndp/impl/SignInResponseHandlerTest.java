@@ -5,6 +5,8 @@
  */
 package com.kingmed.dp.ndp.impl;
 
+import com.kingmed.dp.ndp.NDPServe;
+import java.util.Set;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -21,12 +23,7 @@ import org.springframework.util.Assert;
  * @author zhengjunjie
  */
 public class SignInResponseHandlerTest {
-
-    private NDPServeImpl ndpServe;
-
-    public SignInResponseHandlerTest() {
-    }
-
+    private static Set<NDPServe> allNDPServes;
     @BeforeClass
     public static void setUpClass() {
     }
@@ -37,28 +34,27 @@ public class SignInResponseHandlerTest {
 
     @Before
     public void setUp() {
-        ndpServe = NDPServeFactory.getNDPServe();
+        allNDPServes = NDPServeFactory.getAllNDPServes();
     }
 
     @After
     public void tearDown() {
     }
 
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
     @Test
     public void testSignIn() {
-        String signinUrl = ndpServe.getUrlSignin();
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        NDPServeResponseHandler responeHandler = new SignInResponseHandler();
-        try {
-            HttpGet httpget = new HttpGet(signinUrl);
-            String cookie =httpclient.execute(httpget, responeHandler);
-            Assert.notNull(cookie);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail("认证失败");
+        for(NDPServe ndpServe: allNDPServes){
+            String signinUrl = ndpServe.getUrlSignin();
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            NDPServeResponseHandler responeHandler = new SignInResponseHandler();
+            try {
+                HttpGet httpget = new HttpGet(signinUrl);
+                String cookie =httpclient.execute(httpget, responeHandler);
+                Assert.notNull(cookie);
+            } catch (Exception e) {
+                e.printStackTrace();
+                fail("认证失败");
+            }
         }
     }
 }

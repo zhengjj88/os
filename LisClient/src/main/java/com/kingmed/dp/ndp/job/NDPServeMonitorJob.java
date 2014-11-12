@@ -5,9 +5,7 @@
  */
 package com.kingmed.dp.ndp.job;
 
-import com.kingmed.dp.ndp.Constants;
 import com.kingmed.dp.ndp.NDPServe;
-import com.kingmed.dp.ndp.impl.NDPServeFactory;
 import com.kingmed.dp.ndp.impl.NDPServeImpl;
 import com.kingmed.dp.ndp.impl.NDPServeResponseHandler;
 import com.kingmed.dp.ndp.impl.SignInResponseHandler;
@@ -23,57 +21,32 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
-import org.quartz.DisallowConcurrentExecution;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.quartz.PersistJobDataAfterExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author zhengjunjie
  */
-@PersistJobDataAfterExecution
-@DisallowConcurrentExecution
-public class NDPServeMonitorJob implements Job {
+@Component
+public class NDPServeMonitorJob {
 
     private static final Logger log = LoggerFactory.getLogger(NDPServeMonitorJob.class);
-    //private NDPServe ndpServe;
-    private Set<NDPServe> allNDPserves;
-    //private Long linkedFolerItemId = Constants.LINKED_FOLDERS_ITEMID;
 
     public NDPServeMonitorJob() {
-        allNDPserves = NDPServeFactory.getAllNDPServes();
     }
 
-   /*
-    public void setNdpServe(NDPServe ndpServe) {
-        this.ndpServe = ndpServe;
+    @Scheduled(cron = "0/5 * * * * *")
+    public void execute() {
+        log.warn("..............................................................");
     }
-    */
 
-//    public void setLinkedFolerItemId(Long linkedFolerItemId) {
-//        this.linkedFolerItemId = linkedFolerItemId;
-//    }
-
-    /*
-    public NDPServe getNdpServe() {
-        if (ndpServe == null) {
-            ndpServe = NDPServeFactory.getNDPServe();
-        }
-        return ndpServe;
-    }
-*/
-//    public Long getLinkedFolerItemId() {
-//        return linkedFolerItemId;
-//    }
-
-    @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
+    public void execute(Set<NDPServe> allNDPserves) throws JobExecutionException {
         for (NDPServe serve : allNDPserves) {
-            log.info("调用服务器"+serve.toString());
+            log.info("调用服务器" + serve.toString());
             execute(serve);
         }
     }
@@ -82,8 +55,6 @@ public class NDPServeMonitorJob implements Job {
         String cookie = null;
         String updateStatus = null;
         int retryCounter = 3;
-        //JobDataMap data = context.getJobDetail().getJobDataMap();
-        //String urlForUpdateLinkedFolders = ndpServe.getUrlForUpdateLinkedFolders(Long.MIN_VALUE);
         try {
             while (retryCounter > 0) {
                 log.info("登录");
@@ -95,7 +66,7 @@ public class NDPServeMonitorJob implements Job {
                     log.info("登录成功");
 
                     log.info("更新文件夹");
-                    updateStatus = this.updateLinkedFolders(cookie.trim(),serve);
+                    updateStatus = this.updateLinkedFolders(cookie.trim(), serve);
                     if (updateStatus != null && NDPServeImpl.STATUS_SUCCEEDED.equals(updateStatus)) {
                         log.info("更新文件夹成功,ItemId=" + serve.getRootLinkedFolderItemId());
                     } else {
@@ -114,7 +85,7 @@ public class NDPServeMonitorJob implements Job {
             if (cookie != null) {
                 log.info("注销");
                 try {
-                    this.signOut(cookie,serve);
+                    this.signOut(cookie, serve);
                 } catch (IOException e) {
                     log.error("注销失败" + serve.toString() + ",cookie =" + cookie, e);
                 }
@@ -143,7 +114,7 @@ public class NDPServeMonitorJob implements Job {
         return re;
     }
 
-    protected String updateLinkedFolders(String cookie,NDPServe serve) throws IOException {
+    protected String updateLinkedFolders(String cookie, NDPServe serve) throws IOException {
         String status = null;
         String uri = serve.getUrlForUpdateLinkedFolders();
         NDPServeResponseHandler responeHandler = new UpdateLinkedFoldersResponseHandler();
@@ -172,7 +143,7 @@ public class NDPServeMonitorJob implements Job {
         return re;
     }
 
-    protected String signOut(String cookie,NDPServe serve) throws IOException {
+    protected String signOut(String cookie, NDPServe serve) throws IOException {
         Header header = new BasicHeader("Cookie", cookie);
         String uri = serve.getUrlSignout();
         NDPServeResponseHandler responeHandler = new SignOutResponseHandler();

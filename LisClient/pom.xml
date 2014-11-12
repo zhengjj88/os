@@ -21,9 +21,11 @@
         <jaxen.version>1.1.6</jaxen.version>
         <spring.version>3.2.11.RELEASE</spring.version>
         <shiro.version>1.2.3</shiro.version>
+<!--        <hibernate.core>4.3.7.Final</hibernate.core>-->
         <hibernate.version>3.2.6.ga</hibernate.version>
         <hibernate-annotations.version>3.2.1.ga</hibernate-annotations.version>
         <mysql.version>5.1.32</mysql.version>
+<!--        <hsqldb.version>1.8.0.7</hsqldb.version>-->
     </properties>
     
     <dependencies>
@@ -66,6 +68,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
             <version>${spring.version}</version>
         </dependency>
         <dependency>
@@ -114,6 +121,11 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+<!--        <dependency>
+            <groupId>hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${hsqldb.version}</version>
+        </dependency>-->
     </dependencies>
     
     

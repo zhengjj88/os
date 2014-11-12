@@ -5,7 +5,9 @@
  */
 package com.kingmed.dp.ndp.impl;
 
+import com.kingmed.dp.ndp.NDPServe;
 import java.io.IOException;
+import java.util.Set;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -25,7 +27,7 @@ import org.springframework.util.Assert;
  */
 public class SignOutResponseHandlerTest {
 
-    private NDPServeImpl ndpServe;
+    private static Set<NDPServe> allNDPServes;
 
     public SignOutResponseHandlerTest() {
     }
@@ -40,57 +42,56 @@ public class SignOutResponseHandlerTest {
 
     @Before
     public void setUp() {
-        ndpServe = NDPServeFactory.getNDPServe();
+        allNDPServes = NDPServeFactory.getAllNDPServes();
     }
 
     @After
     public void tearDown() {
     }
 
-    // TODO add test methods here.
-    // The methods must be annotated with annotation @Test. For example:
-    //
     @Test
     public void testSignOut() {
-        String signinUrl = ndpServe.getUrlSignin();
-        String signOutUrl =ndpServe.getUrlSignout();
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        NDPServeResponseHandler responeHandler = new SignInResponseHandler();
-        String cookie =null;
-        try {
-            HttpGet httpget = new HttpGet(signinUrl);
-            httpclient.execute(httpget, responeHandler);
-            cookie = responeHandler.getCookie();
-            Assert.notNull(cookie);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail("认证失败");
-        }finally{
+        for (NDPServe ndpServe : allNDPServes) {
+            String signinUrl = ndpServe.getUrlSignin();
+            String signOutUrl = ndpServe.getUrlSignout();
+            CloseableHttpClient httpclient = HttpClients.createDefault();
+            NDPServeResponseHandler responeHandler = new SignInResponseHandler();
+            String cookie = null;
             try {
-                httpclient.close();
-            } catch (IOException ex) {
-                fail("关闭连接失败");
+                HttpGet httpget = new HttpGet(signinUrl);
+                httpclient.execute(httpget, responeHandler);
+                cookie = responeHandler.getCookie();
+                Assert.notNull(cookie);
+            } catch (Exception e) {
+                e.printStackTrace();
+                fail("认证失败");
+            } finally {
+                try {
+                    httpclient.close();
+                } catch (IOException ex) {
+                    fail("关闭连接失败");
+                }
             }
-        }
-        
-        Header header = new BasicHeader("Cookie",cookie);
-        httpclient = HttpClients.createDefault();
-        responeHandler = new SignOutResponseHandler();
-        try {
-            HttpGet httpget = new HttpGet(signOutUrl);
-            httpget.setHeader(header.getName(),header.getValue());
-            String status = httpclient.execute(httpget, responeHandler);
-            assertTrue("注销成功", NDPServeImpl.STATUS_SUCCEEDED.equals(status));
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail("注销失败");
-        }finally{
+
+            Header header = new BasicHeader("Cookie", cookie);
+            httpclient = HttpClients.createDefault();
+            responeHandler = new SignOutResponseHandler();
             try {
-                httpclient.close();
-            } catch (IOException ex) {
-                fail("关闭连接失败");
+                HttpGet httpget = new HttpGet(signOutUrl);
+                httpget.setHeader(header.getName(), header.getValue());
+                String status = httpclient.execute(httpget, responeHandler);
+                assertTrue("注销成功", NDPServeImpl.STATUS_SUCCEEDED.equals(status));
+            } catch (Exception e) {
+                e.printStackTrace();
+                fail("注销失败");
+            } finally {
+                try {
+                    httpclient.close();
+                } catch (IOException ex) {
+                    fail("关闭连接失败");
+                }
             }
+
         }
-        
     }
 }

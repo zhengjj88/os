@@ -5,7 +5,7 @@
  */
 package com.kingmed.dp.ndp.job.scheduler;
 
-import com.kingmed.dp.ndp.job.NDPServeMonitorJob;
+import com.kingmed.dp.ndp.job.DelegateNDPServeMonitorJob;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import org.quartz.CronTrigger;
 import static org.quartz.JobBuilder.newJob;
@@ -40,9 +40,10 @@ public class Bootstrap {
     private void statrup(){
         log.info("任务开始....");
         try {
-            JobDetail job = newJob(NDPServeMonitorJob.class)
+            JobDetail job = newJob(DelegateNDPServeMonitorJob.class)
                     .withIdentity("job1", "group1")
                     .build();
+            
             CronTrigger trigger = newTrigger()
                     .withIdentity("trigger2", "group1")
                     .withSchedule(cronSchedule("0/15 * * * * ?"))
