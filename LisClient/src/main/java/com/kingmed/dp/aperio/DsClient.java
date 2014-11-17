@@ -32,7 +32,7 @@ public class DsClient {
 
         HttpClient hc = HttpClients.createDefault();
         HttpPost httpPost = new HttpPost(url);
-        //httpPost.addHeader("Content-Type", "text/xml;charset=utf-8");
+        httpPost.addHeader("Content-Type", "text/xml;charset=utf-8");
         httpPost.addHeader("SOAPAction", "http://www.aperio.com/webservices/#Logon");
         StringEntity myEntity = new StringEntity(body, ContentType.create("text/xml", "UTF-8"));
         httpPost.setEntity(myEntity);

@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.kingmed.dp.ndp.impl.SignInResponseHandlerTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.082 sec
