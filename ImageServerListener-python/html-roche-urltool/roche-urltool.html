@@ -1,0 +1,42 @@
+﻿<!doctype html>
+<html ng-app>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<script src="lib/angular.js"></script>
+		<script src="app/app.js"></script>
+		<script src="app/md5.js"></script>
+		<script src="app/base64.js"></script>
+	</head>
+	
+	<body>
+		<div ng-controller="rocheController">
+			<div ng-show='true'>
+				protocol:<input ng-model="roche.protocol">
+				<br/>
+				host:<input ng-model="roche.host">
+				<br/>
+				host:<input ng-model="roche.port">
+				<br/>
+				viewerPath:<input ng-model="roche.viewerPath">
+				<br/>
+				thumbnailPath:<input ng-model="roche.thumbnailPath">
+				<br/>
+				slideView:<input ng-model="roche.slideView" size="50">
+				<br/>
+				UID:<input ng-model="roche.UID" size="50">
+				<br/>
+				token:<input ng-model="roche.token" size="50">
+				<br/>
+				SLID:<input ng-model="roche.barcode" size="50">
+				<br/>
+			</div>
+			二维码:<input ng-model="roche.barcode" size="50">
+			<br/>
+			<br/>
+			数字切片URL:<input ng-model="roche.slideUrl" size="150">
+			<br/>
+			缩略图URL:<input ng-model="roche.thumbnailUrl" size="150">
+			<br/>
+		</div>
+	</body>
+</html>
