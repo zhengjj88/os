@@ -1,0 +1,35 @@
+﻿<!doctype html>
+<html ng-app>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<script src="lib/angular.js"></script>
+		<script src="app/app.js"></script>
+		<script src="app/md5.js"></script>
+	</head>
+	
+	<body>
+		<div ng-controller="kfbioController">
+			<div ng-show='false'>
+				protocol:<input ng-model="kfbio.protocol">
+				<br/>
+				host:<input ng-model="kfbio.host">
+				<br/>
+				host:<input ng-model="kfbio.port">
+				<br/>
+				viewerPath:<input ng-model="kfbio.viewerPath">
+				<br/>
+				thumbnailPath:<input ng-model="kfbio.thumbnailPath">
+				<br/>
+				token:<input ng-model="kfbio.token" size="50">
+				<br/>
+			</div>
+			二维码:<input ng-model="kfbio.barcode" size="50">
+			<br/>
+			<br/>
+			数字切片URL:<input ng-model="kfbio.slideUrl" size="150">
+			<br/>
+			缩略图URL:<input ng-model="kfbio.thumbnailUrl" size="150">
+			<br/>
+		</div>
+	</body>
+</html>
