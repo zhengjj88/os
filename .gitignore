@@ -1,2 +1,4 @@
 /LisClient/target/
 /dp-HL7Inspector/target/
+/nodejs/nodejs-ws-mariadb/node_modules
+/nodejs/nodejs-demo/node_modules
