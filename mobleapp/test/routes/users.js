@@ -3,45 +3,37 @@ var router = express.Router();
 var inspect = require('util').inspect;
 
 var c = require('./db');
-/* GET users listing. */
-router.get('/', function(req, res) {
-  var qc = {};
-  qc.username = req.query['username'];
-  qc.imsi = req.query['imsi'];
-  qc.pageNumber = req.query['pageNumber'];
-  qc.pageSize = req.query['pageSize'];
-  
-  var userinfo ;
-  if(qc.username == undefined && qc.imsi == undefined){
-    console.log('find all user');
-    if(qc.pageNumber == undefined || qc.pageSize == undefined){
-      res.status(400).json({'code':'10'});
-      return;
-    }
-  } 
-  var querySql="SELECT t.USERNAME,t.REAL_NAME,t.CREATE_DATE,t.IMSI,t.DEPT,t.SUB_COMPANY,t.ENABLE FROM USER t ";
+/* Get punch card list */
+
+router.get('/punchcard',function(req,res){
+  console.log(req.query);
+
+  if(req.query.pageNumber == undefined || req.query.pageSize == undefined){
+    res.status(400).json({'code':'10'});
+    return;
+  }
+  var querySql="SELECT t.ID,t.USERNAME,t.LOCATION,t.DEPT,t.CREATE_DATE,t.STATE FROM PUNCH_CARD t ";
   var whereCause = "WHERE";
-console.log("2....................."+qc.username);
 //check username
-  if(!(qc.username == undefined)){
+  if(!(req.query.username == undefined)){
     if (whereCause.indexOf("=")==-1){
       whereCause = whereCause.concat(" t.username = :username");
     }else{
       whereCause = whereCause.concat(" and t.username = :username"); 
     }
   }
-  console.log('..........................');   
 //check imsi 
-  if(!(qc.imsi == undefined)){
+  if(!(req.query.dept == undefined)){
     if (whereCause.indexOf("=")==-1){
-      whereCause = whereCause.concat(" t.imsi= :imsi");
+      whereCause = whereCause.concat(" t.dept= :dept");
     }else{
-      whereCause = whereCause.concat(" and t.imsi= :imsi"); 
+      whereCause = whereCause.concat(" and t.dept= :dept"); 
     }
   }
 
  //build the query sql 
-  querySql = querySql.concat(whereCause);
+  if(whereCause.indexOf("=")>-1)
+    querySql = querySql.concat(whereCause);
   console.log('querySql = ' +querySql);
   var cb = function(error,records){
     if(error)
@@ -53,21 +45,56 @@ console.log("2....................."+qc.username);
   cb.pageNumber = 1 ;
   cb.pageSize = 10;
   cb.querySql = querySql;
-  cb.qc = qc;
+  cb.qc =req.query;
   c.QueryRecord(cb);
-/*  userinfo = c.QueryRecord(function(error,records){
+});
+/* GET users listing. */
+router.get('/', function(req, res) {
+  console.log(req.query);
+  
+  if(req.query.username == undefined && req.query.imsi == undefined){
+    console.log('find all user');
+    if(req.query.pageNumber == undefined || req.query.pageSize == undefined){
+      res.status(400).json({'code':'10'});
+      return;
+    }
+  } 
+  var querySql="SELECT t.USERNAME,t.REAL_NAME,t.CREATE_DATE,t.IMSI,t.DEPT,t.SUB_COMPANY,t.ENABLE FROM USER t ";
+  var whereCause = "WHERE";
+//check username
+  if(!(req.query.username == undefined)){
+    if (whereCause.indexOf("=")==-1){
+      whereCause = whereCause.concat(" t.username = :username");
+    }else{
+      whereCause = whereCause.concat(" and t.username = :username"); 
+    }
+  }
+//check imsi 
+  if(!(req.query.imsi == undefined)){
+    if (whereCause.indexOf("=")==-1){
+      whereCause = whereCause.concat(" t.imsi= :imsi");
+    }else{
+      whereCause = whereCause.concat(" and t.imsi= :imsi"); 
+    }
+  }
+
+ //build the query sql 
+  if(whereCause.indexOf("=")>-1)
+    querySql = querySql.concat(whereCause);
+  console.log('querySql = ' +querySql);
+  var cb = function(error,records){
     if(error)
       throw error;
     else{ 
-//      console.log(records);
         res.status(200).json(records);
     }
-  });
-*/
+  };
+  cb.pageNumber = 1 ;
+  cb.pageSize = 10;
+  cb.querySql = querySql;
+  cb.qc =req.query;
+  c.QueryRecord(cb);
 
-// console.log(userinfo);
-//  res.send('respond with a resource,username= '+username +",imsi="+imsi);
-// res.status(200).json(userinfo);
 });
 
 //add by jack 20141126 for punch card
@@ -78,7 +105,7 @@ router.post('/:username/punchcard',function(req,res){
   var location = req.body.location;
   var dept = req.body.dept;
   var state = req.body.state;
-  console.log(JSON.stringify(req.body));
+  console.log(req.body);
 
 c.query('INSERT INTO PUNCH_CARD (USERNAME,LOCATION,DEPT,CREATE_DATE,STATE) VALUES(:name,:location,:dept,CURRENT_TIMESTAMP,:state)',
         { name: username,
