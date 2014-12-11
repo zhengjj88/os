@@ -4,6 +4,7 @@ import express = require('express')
 import logger = require("morgan")
 import cookieParser = require("cookie-parser")
 import bodyParser = require("body-parser")
+import winston = require('winston')
  
 import db = require("./db")
 var app = express();
@@ -88,13 +89,17 @@ app.get('/api/v1/user', function(req, res){
     console.log("query user all"); 
     var pageSize = req.query.pageSize;
     var pageNumber = req.query.pageNumber;
+debugger;
     if(pageSize == undefined){
       pageSize = 20;
     }
+    
     if(pageNumber == undefined) {
-      pageNumber == 0;
+      pageNumber = 0;
     }
+    winston.info('befre construct, pageNumber = ' + pageNumber + ', pageSize= ' +pageSize);
     var page = new db.Page(pageNumber, pageSize);
+    winston.info('after construct, rowCount = ' +page.rowCount +', offset = ' + page.offset);
     db.findUsers(null, page, function(users) {
       response.code = '00';
       response.data = users;

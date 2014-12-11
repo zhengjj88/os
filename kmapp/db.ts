@@ -1,4 +1,5 @@
 import mysql = require("mysql");
+import winston = require('winston');
 
 var db = mysql.createPool({
   connectionLimit : 10,
@@ -96,13 +97,13 @@ class SqlBuilder{
 }
 
 export class Page {
-  pageNumber: number;
   offset: number;
   rowCount: number; 
 
   constructor(pageNumber: number, pageSize: number){
     this.rowCount = pageSize;
     this.offset = this.rowCount * pageNumber;
+    winston.info('offset = ' + this.offset + ', rowCount = ' + this.rowCount + ', pageNumber = ' + pageNumber);
   }
 }
 
