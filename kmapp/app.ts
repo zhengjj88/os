@@ -92,7 +92,7 @@ app.get('/api/v1/user', function(req, res){
       pageSize = 20;
     }
     if(pageNumber == undefined) {
-      pageNumber == 0;
+      pageNumber = 0;
     }
     var page = new db.Page(pageNumber, pageSize);
     db.findUsers(null, page, function(users) {
