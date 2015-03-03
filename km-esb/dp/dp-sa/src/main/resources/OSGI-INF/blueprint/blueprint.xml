@@ -18,43 +18,33 @@
 
 -->
 <blueprint
-        xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
+    
+    <bean id="saServiceHandler" class="com.kingmed.dp.sa.service.impl.SAServiceHandler">
+        <property name="simpleUserDAO" ref="simpleUserDAO"/>
+    </bean>
+    
+   <bean id="simpleUserDAO" class="com.kingmed.dp.sa.dao.impl.SimpleUserDAOImpl">
+        <property name="dataSource" ref="dp_dataSource"/>
+    </bean>
 
-    <bean id="orderBean" class="com.kingmed.dp.sa.OrderBean" init-method="init"/>
-
-    <reference id="dataSource" interface="javax.sql.DataSource" filter="(datasource.name=dp)">
+    <reference id="dp_dataSource" interface="javax.sql.DataSource" filter="(datasource.name=dp)">
         <reference-listener bind-method="onBind" unbind-method="onUnbind">
             <bean class="com.kingmed.dp.sa.ListenerBean"/>
         </reference-listener>
     </reference>
 
     <bean id="sql" class="org.apache.camel.component.sql.SqlComponent">
-        <property name="dataSource" ref="dataSource"/>
+        <property name="dataSource" ref="dp_dataSource"/>
     </bean>
 
     <camelContext xmlns="http://camel.apache.org/schema/blueprint">
-        <propertyPlaceholder id="placeholder" location="classpath:sql.properties"/>
-        <route id="generateOrder-route">
-            <from uri="timer:foo?period=5s"/>
-            <transform>
-                <method ref="orderBean" method="generateRandomOrder"/>
-            </transform>
-            <to uri="sql:{{sql.insertOrder}}"/>
-            <log message="Inserted a new order of ${body[item]}"/>
-        </route>
-
-        <!-- route that process the orders by picking up new rows from the database
-      and when done processing then update the row to mark it as processed -->
-        <route id="processOrder-route">
-            <from uri="sql:{{sql.selectOrder}}?consumer.onConsume={{sql.markOrder}}"/>
-            <to uri="bean:orderBean?method=processOrder"/>
-            <log message="${body}"/>
+        <route id="getAllExperts">
+            <from uri="direct-vm:getAllExperts" />
+            <log message="getPerson invocation with id: ${body}"/>
+            <bean method="getAllExperts" ref="saServiceHandler"/>
         </route>
     </camelContext>
-
-
-
-
 </blueprint>

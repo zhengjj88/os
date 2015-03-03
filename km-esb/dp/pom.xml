@@ -12,5 +12,6 @@
     <modules>
         <module>dp-datasource</module>
         <module>dp-sa</module>
+        <module>dp-web</module>
     </modules>
 </project>

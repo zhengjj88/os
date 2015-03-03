@@ -25,26 +25,21 @@
 
     <cm:property-placeholder id="myblueprint.placeholder" persistent-id="com.kingmed.dp">
         <cm:default-properties>
-            <cm:property name="derby_username" value="root"/>
-            <cm:property name="derby_password" value=""/>
-            <cm:property name="derby_database" value="dpdb"/>
+            <cm:property name="mysql_username" value="root"/>
+            <cm:property name="mysql_password" value=""/>
+            <cm:property name="mysql_database" value="dpdb"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
 
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <bean id="dp_dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
         <property name="url" value="jdbc:mysql://localhost:3306/dpdb"/>
-        <property name="username" value="${derby_username}"/>
-        <property name="password" value="${derby_password}"/>
+        <property name="username" value="${mysql_username}"/>
+        <property name="password" value="${mysql_password}"/>
     </bean>
 
-    <bean id="initDatabase" class="com.kingmed.dp.datasource.DatabaseBeanMysql"
-          init-method="create" destroy-method="destroy">
-        <property name="dataSource" ref="dataSource"/>
-    </bean>
-
-    <service ref="dataSource" interface="javax.sql.DataSource">
+    <service ref="dp_dataSource" interface="javax.sql.DataSource">
         <service-properties>
             <entry key="datasource.name" value="dp"/>
             <entry key="datasource.type" value="Mysql"/>
