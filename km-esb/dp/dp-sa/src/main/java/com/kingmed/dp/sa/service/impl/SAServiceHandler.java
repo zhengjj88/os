@@ -21,7 +21,7 @@ public class SAServiceHandler {
         this.simpleUserDAO = simpleUserDAO;
     }
     
-    public String getAllExperts(){
+    public String getAllExperts(String country){
         return "{'name':'test'}";
     }
 }

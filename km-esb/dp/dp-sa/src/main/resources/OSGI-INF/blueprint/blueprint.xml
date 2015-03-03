@@ -43,7 +43,10 @@
     <camelContext xmlns="http://camel.apache.org/schema/blueprint">
         <route id="getAllExperts">
             <from uri="direct-vm:getAllExperts" />
-            <log message="getPerson invocation with id: ${body}"/>
+            <transform>
+                <simple>${header.country}</simple>
+            </transform>
+            <log message="getAllExperts invocation with country: ${body}"/>
             <bean method="getAllExperts" ref="saServiceHandler"/>
         </route>
     </camelContext>

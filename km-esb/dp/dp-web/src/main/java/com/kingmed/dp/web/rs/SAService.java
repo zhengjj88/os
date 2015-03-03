@@ -16,9 +16,9 @@ import javax.ws.rs.*;
 public class SAService {
 
     @GET
-    @Path("/users/")
+    @Path("/users/get/{country}/")
     @Produces("application/json")
-    public SimpleUserContainer getAllExperts() {
+    public String getAllExperts(@PathParam("country") String country) {
         return null;
     }
 }

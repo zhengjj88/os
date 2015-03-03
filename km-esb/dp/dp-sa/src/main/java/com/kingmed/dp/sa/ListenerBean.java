@@ -25,8 +25,6 @@ public class ListenerBean {
 
     public void onBind(Object service, Map properties){
         LOGGER.info("Binding to "+ properties.get("datasource.type"));
-
-
     }
     public void onUnbind(Object service, Map properties){
         LOGGER.info("Unbinding from "+ properties.get("datasource.type"));
