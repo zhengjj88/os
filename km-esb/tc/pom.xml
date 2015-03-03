@@ -9,4 +9,7 @@
     <artifactId>tc</artifactId>
     <packaging>pom</packaging>
     <name>Kingmed TC components</name>
+    <modules>
+        <module>tc-msg-consumer</module>
+    </modules>
 </project>
