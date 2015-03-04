@@ -11,5 +11,6 @@
     <name>Kingmed TC components</name>
     <modules>
         <module>tc-msg-consumer</module>
+        <module>lis</module>
     </modules>
 </project>

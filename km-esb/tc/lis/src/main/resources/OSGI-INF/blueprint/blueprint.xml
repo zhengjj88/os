@@ -25,38 +25,19 @@
     xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
 http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
-    <cm:property-placeholder persistent-id="com.kingmed.tc">
-        <cm:default-properties>
-            <cm:property name="prefix" value="KMTC"/>
-        </cm:default-properties>
-    </cm:property-placeholder>
-    
     <camelContext xmlns="http://camel.apache.org/schema/blueprint">
         <route>
             <from uri="timer://myTimer?fixedRate=true&amp;period=2000" />
             <bean ref="myTransform" method="transform"/>
             <to uri="activemq:queue:q_test" />
         </route>
-<!--        <route>
-            <from uri="activemq:queue:q_test" />
-            <to uri="log:ExampleActiveMQRouterBlueprint" />
-        </route>-->
-        
-        <route>
-            <from uri="activemq:queue:q_test" />
-            <to uri="bean:specimenRequestProcessor" />
-        </route>
     </camelContext>
 
-    <!-- use CF from ActiveMQ blueprint service running in container -->
     <reference id="connectionFactory" interface="javax.jms.ConnectionFactory" />
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
-<!--        <property name="connectionFactory" ref="connectionFactory" />-->
-            <property name="brokerURL" value="failover:(tcp://192.168.2.164:61616,tcp://192.168.2.164:61617,tcp://192.168.2.164:61618,tcp://192.168.2.164:61619)"/>
+        <property name="brokerURL" value="failover:(tcp://192.168.2.164:61616,tcp://192.168.2.164:61617,tcp://192.168.2.164:61618,tcp://192.168.2.164:61619)"/>
     </bean>
 
-    <bean id="myTransform" class="com.kingmed.tc.msg.MyTransform">
-        <property name="prefix" value="${prefix}" />
-    </bean>
-    <bean id="specimenRequestProcessor" class="com.kingmed.tc.msg.consumer.SpecimenRequestProcessor"/>
+    <bean id="client" class="com.kingmed.lis.ws.client.Client"/>
+
 </blueprint>
