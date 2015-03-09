@@ -5,8 +5,10 @@
  */
 package com.kingmed.dp.web.rs;
 
-import com.kingmed.dp.sa.model.SimpleUserContainer;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 
 /**
  *
@@ -16,7 +18,7 @@ import javax.ws.rs.*;
 public class SAService {
 
     @GET
-    @Path("/users/get/{country}/")
+    @Path("/users/get/{country}/")		
     @Produces("application/json")
     public String getAllExperts(@PathParam("country") String country) {
         return null;

@@ -28,7 +28,7 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
     <camelContext xmlns="http://camel.apache.org/schema/blueprint">
         <route>
             <from uri="timer://myTimer?fixedRate=true&amp;period=2000" />
-            <bean ref="myTransform" method="transform"/>
+            <bean ref="client" method="login"/>
             <to uri="activemq:queue:q_test" />
         </route>
     </camelContext>
@@ -39,5 +39,6 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
     </bean>
 
     <bean id="client" class="com.kingmed.lis.ws.client.Client"/>
+    
 
 </blueprint>

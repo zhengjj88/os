@@ -25,18 +25,20 @@
 
     <cm:property-placeholder id="myblueprint.placeholder" persistent-id="com.kingmed.dp">
         <cm:default-properties>
-            <cm:property name="mysql_username" value="root"/>
-            <cm:property name="mysql_password" value=""/>
-            <cm:property name="mysql_database" value="dpdb"/>
+            <cm:property name="driverClassName" value=""/>
+            <cm:property name="url" value=""/>
+            <cm:property name="username" value=""/>
+            <cm:property name="password" value=""/>
+            <cm:property name="mysql_database" value=""/>
         </cm:default-properties>
     </cm:property-placeholder>
 
 
     <bean id="dp_dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://localhost:3306/dpdb"/>
-        <property name="username" value="${mysql_username}"/>
-        <property name="password" value="${mysql_password}"/>
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
     </bean>
 
     <service ref="dp_dataSource" interface="javax.sql.DataSource">
