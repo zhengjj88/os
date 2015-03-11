@@ -25,8 +25,8 @@
 
     <cm:property-placeholder id="myblueprint.placeholder" persistent-id="com.kingmed.yuyt.sql">
         <cm:default-properties>
-            <cm:property name="oracle_username" value="kmtc_sys1"/>
-            <cm:property name="oracle_password" value="521657"/>
+            <cm:property name="oracle_username" value=""/>
+            <cm:property name="oracle_password" value=""/>
             <cm:property name="oracle_database" value="yuytdb"/>
         </cm:default-properties>
     </cm:property-placeholder>
