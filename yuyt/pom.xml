@@ -14,6 +14,14 @@
         <drools.version>5.6.0.Final</drools.version>
         <slf4j.version>1.7.5</slf4j.version>
         <jaxb.api.version>2.2</jaxb.api.version>
+        <camel.version>2.13.3</camel.version>
+        <commons-io.version>2.4</commons-io.version>
+        <servicemix.specs.version>2.4.0</servicemix.specs.version>
+        <activiti-camel.version>5.16.4</activiti-camel.version>
+        <geronimo.specs.version>1.1.3</geronimo.specs.version>
+        <commons-httpclient.version>3.1_7</commons-httpclient.version>
+        <wss4j.version>1.6.15</wss4j.version>
+        <felix.version>2.5.3</felix.version>
     </properties>
     
     <!-- Managed dependencies -->
@@ -22,89 +30,89 @@
             <dependency>
                 <groupId>org.apache.camel</groupId>
                 <artifactId>camel-parent</artifactId>
-        	<version>2.13.3</version>
+        	<version>${camel.version}</version>
         	<type>pom</type>
         	<scope>import</scope>
             </dependency>
       	    <dependency>
         	<groupId>org.apache.cxf</groupId>
         	<artifactId>cxf-rt-transports-http</artifactId>
-        	<version>2.7.13</version>
+        	<version>${cxf.version}</version>
       	    </dependency>
             <dependency>
         	<groupId>org.apache.cxf</groupId>
         	<artifactId>cxf-rt-ws-security</artifactId>
-        	<version>2.7.13</version>
+        	<version>${cxf.version}</version>
       	    </dependency>
       	    <dependency>
         	<groupId>org.apache.servicemix.specs</groupId>
         	<artifactId>org.apache.servicemix.specs.jsr311-api-1.1.1</artifactId>
-        	<version>2.4.0</version>
+        	<version>${servicemix.specs.version}</version>
       	    </dependency>
       	    <dependency>
         	<groupId>commons-io</groupId>
         	<artifactId>commons-io</artifactId>
-        	<version>2.4</version>
+        	<version>${commons-io.version}</version>
       	    </dependency>
       	    <dependency>
         	<groupId>org.apache.servicemix.specs</groupId>
         	<artifactId>org.apache.servicemix.specs.jaxb-api-2.2</artifactId>
-        	<version>2.4.0</version>
+        	<version>${servicemix.specs.version}</version>
       	    </dependency>
       	    <dependency>
         	<groupId>org.apache.cxf</groupId>
         	<artifactId>cxf-rt-frontend-jaxws</artifactId>
-        	<version>2.7.13</version>
+        	<version>${cxf.version}</version>
      	    </dependency>
       	    <dependency>
         	<groupId>org.apache.cxf</groupId>
         	<artifactId>cxf-api</artifactId>
-        	<version>2.7.13</version>
+        	<version>${cxf.version}</version>
             </dependency>
      	    <dependency>
         	<groupId>org.apache.cxf</groupId>
         	<artifactId>cxf-rt-transports-http-jetty</artifactId>
-        	<version>2.7.13</version>
+        	<version>${cxf.version}</version>
             </dependency>
       	    <dependency>
         	<groupId>org.apache.cxf</groupId>
         	<artifactId>cxf-rt-ws-rm</artifactId>
-        	<version>2.7.13</version>
+        	<version>${cxf.version}</version>
       	    </dependency>
       	    <dependency>
         	<groupId>org.apache.cxf</groupId>
         	<artifactId>cxf-rt-ws-addr</artifactId>
-        	<version>2.7.13</version>
+        	<version>${cxf.version}</version>
       	    </dependency>
       	    <dependency>
         	<groupId>org.apache.cxf</groupId>
         	<artifactId>cxf-rt-ws-policy</artifactId>
-        	<version>2.7.13</version>
+        	<version>${cxf.version}</version>
       	    </dependency>
       	    <dependency>
         	<groupId>org.apache.cxf.services.wsn</groupId>
         	<artifactId>cxf-services-wsn-core</artifactId>
-        	<version>2.7.13</version>
+        	<version>${cxf.version}</version>
       	    </dependency>
             <dependency>
         	<groupId>org.activiti</groupId>
         	<artifactId>activiti-camel</artifactId>
-        	<version>5.16.4</version>
+        	<version>${activiti-camel.version}</version>
             </dependency>
       	    <dependency>
         	<groupId>org.apache.geronimo.specs</groupId>
         	<artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
-        	<version>1.1.3</version>
+        	<version>${geronimo.specs.version}</version>
             </dependency>
       	    <dependency>
         	<groupId>org.apache.servicemix.bundles</groupId>
         	<artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
-        	<version>3.1_7</version>
+        	<version>${commons-httpclient.version}</version>
       	    </dependency>
             <dependency>
         	<groupId>org.apache.ws.security</groupId>
         	<artifactId>wss4j</artifactId>
-        	<version>1.6.15</version>
+        	<version>${wss4j.version}</version>
       	    </dependency>
     	</dependencies>
     </dependencyManagement>
@@ -115,7 +123,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
               	    <artifactId>maven-bundle-plugin</artifactId>
-          	    <version>2.5.3</version>
+          	    <version>${felix.version}</version>
           	    <extensions>true</extensions>
                 </plugin>
       	    </plugins>

@@ -18,12 +18,19 @@
 
 -->
 <blueprint
-        xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
-    
+    xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:broker="http://activemq.apache.org/schema/core"
+    xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
+
     <bean id="orderBean" class="com.kingmed.yuyt.sql.OrderBean" init-method="init"/>
-    <bean id="specBean" class="com.kingmed.yuyt.sql.SpecBean"/>
+    <bean id="specimenBean" class="com.kingmed.yuyt.sql.SpecimenBean"/>
+    <bean id="myTransform" class="com.kingmed.yuyt.msg.MyTransform">
+        <property name="prefix" value="${prefix}" />
+    </bean>
+    <bean id="lisClient" class="com.kingmed.lis.ws.client.LISClient"/>
     <reference id="yuytDataSource" interface="javax.sql.DataSource" filter="(datasource.name=yuyt)">
         <reference-listener bind-method="onBind" unbind-method="onUnbind">
             <bean class="com.kingmed.yuyt.sql.ListenerBean"/>
@@ -33,11 +40,21 @@
     <bean id="sql" class="org.apache.camel.component.sql.SqlComponent">
         <property name="dataSource" ref="yuytDataSource"/>
     </bean>
-
+    
+    <cm:property-placeholder persistent-id="com.kingmed.yuyt">
+        <cm:default-properties>
+            <cm:property name="prefix" value="yuyt"/>
+        </cm:default-properties>
+    </cm:property-placeholder>
+    <reference id="connectionFactory" interface="javax.jms.ConnectionFactory" />
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="brokerURL" value="failover:(tcp://192.168.2.164:61616,tcp://192.168.2.164:61617,tcp://192.168.2.164:61618,tcp://192.168.2.164:61619)"/>
+    </bean>
+    
     <camelContext xmlns="http://camel.apache.org/schema/blueprint">
         
         <propertyPlaceholder id="placeholder" location="classpath:sql.properties"/>
-<!--        <route id="generateOrder-route">
+        <!--        <route id="generateOrder-route">
             <from uri="timer:foo?period=5s"/>
             <transform>
                 <method ref="orderBean" method="generateRandomOrder"/>
@@ -47,20 +64,46 @@
         </route>-->
 
         <!-- route that process the orders by picking up new rows from the database
-      and when done processing then update the row to mark it as processed -->
+        and when done processing then update the row to mark it as processed -->
       
-<!--        <route id="processOrder-route">
+        <!--        <route id="processOrder-route">
             <from uri="sql:{{sql.selectOrder}}?consumer.onConsume={{sql.markOrder}}"/>
             <to uri="bean:orderBean?method=processOrder"/>
             <log message="${body}"/>
         </route>-->
         
-         <route id="spec-in-db-activemq-route">
-<!--            <from uri="sql:{{sql.selectSpecRcved}}?consumer.onConsume={{sql.markSpec}}"/>-->
-            <from uri="sql:{{sql.selectSpecRcved}}"/>
-            <to uri="bean:specBean?method=processSpec"/>
-            <log message="${body}"/>
+        <!-- 转换标本信息 -->
+        <route id="uploadSpec1-route">
+            <from uri="sql:{{sql.selectSpecRcved}}?consumer.onConsume={{sql.markSpec}}"/>
+            <to uri="bean:specimenBean?method=convertSpecimen"/>
+            <to uri="sql:{{sql.insertLog}}"/>
+            <log message="已经转换标本信息 ${body[id]}"/>
+        </route>
+        <!-- 上传标本信息 写入到消息队列 -->
+        <route id="uploadSpec2-route">
+            <from uri="sql:{{sql.selectMsg}}?consumer.onConsume={{sql.markMsgSucess}}"/>
+            <setBody>
+                <simple>${body[msg]}</simple>
+            </setBody>
+            <to uri="activemq:queue:q_test" />
+            <log message="已经上传标本信息到MQ ${body}"/>
         </route>
         
+        <!-- 上传标本信息，从消息队列写入到LIS中 -->
+        <route id="uploadSpec3-route">
+            <from uri="activemq:queue:q_test" />
+            <to uri="bean:specimenBean" />
+        </route>
+        
+        <route>
+            <from uri="timer://myTimer?fixedRate=true&amp;period=2000" />
+            <bean ref="lisClient" method="login"/>
+            <to uri="activemq:queue:q_test" />
+        </route>
+        <!--        <route id="uploadSpec-route">
+            <from uri="timer://myTimer?fixedRate=true&amp;period=2000" />
+            <bean ref="myTransform" method="transform"/>
+            <to uri="activemq:queue:q_test" />
+        </route>-->
     </camelContext>
 </blueprint>
