@@ -1,20 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Licensed to the Apache Software Foundation (ASF) under one or more
-    contributor license agreements.  See the NOTICE file distributed with
-    this work for additional information regarding copyright ownership.
-    The ASF licenses this file to You under the Apache License, Version 2.0
-    (the "License"); you may not use this file except in compliance with
-    the License.  You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+    Licensed to Kingmed
 
 -->
 <blueprint
@@ -26,7 +13,14 @@
 http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
     <bean id="orderBean" class="com.kingmed.yuyt.sql.OrderBean" init-method="init"/>
-    <bean id="specimenBean" class="com.kingmed.yuyt.sql.SpecimenBean"/>
+    <bean id="specimenBean" class="com.kingmed.yuyt.bean.SpecimenBean">
+        <property name="lisClients">
+            <map>
+                <entry key="01.1" value-ref="testLISClient"/>
+            </map>
+        </property>
+    </bean>
+    <bean id="specimenResponseBean" class="com.kingmed.yuyt.bean.SpecimenResponseBean"/>
     <bean id="myTransform" class="com.kingmed.yuyt.msg.MyTransform">
         <property name="prefix" value="${prefix}" />
     </bean>
@@ -51,27 +45,62 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
         <property name="brokerURL" value="failover:(tcp://192.168.2.164:61616,tcp://192.168.2.164:61617,tcp://192.168.2.164:61618,tcp://192.168.2.164:61619)"/>
     </bean>
     
+    <bean id="testGZ" class ="com.kingmed.yuyt.model.Hospital">
+        <property name="companyCode" value="01.1"/>
+        <property name="code" value="01.10.0010"/>
+        <property name="name" value="广州金域测试医院"/>
+        <property name="lisUsername" value="01.10.0010"/>
+        <property name="lisPassword" value="01100010"/>
+    </bean>
+    <bean id="testGZHA" class ="com.kingmed.yuyt.model.Hospital">
+        <property name="companyCode" value="01.1"/>
+        <property name="code" value="008279"/>
+        <property name="name" value="广州医院A"/>
+        <property name="lisUsername" value="008279"/>
+        <property name="lisPassword" value="008279"/>
+    </bean>
+    <bean id="testGZHB" class ="com.kingmed.yuyt.model.Hospital">
+        <property name="companyCode" value="01.1"/>
+        <property name="code" value="008280"/>
+        <property name="name" value="广州医院B"/>
+        <property name="lisUsername" value="008280"/>
+        <property name="lisPassword" value="008280"/>
+    </bean>
+    <bean id="testGZHC" class ="com.kingmed.yuyt.model.Hospital">
+        <property name="companyCode" value="01.1"/>
+        <property name="code" value="008281"/>
+        <property name="name" value="广州医院C"/>
+        <property name="lisUsername" value="008281"/>
+        <property name="lisPassword" value="008281"/>
+    </bean>
+    <bean id = "hospitalCache" class="com.kingmed.yuyt.cache.HospitalCache">
+        <property name="cache">
+            <map>
+                <entry key="01.1-01.10.0010" value-ref="testGZ"/>
+                <entry key="01.1-008279" value-ref="testGZHA"/>
+                <entry key="01.1-008280" value-ref="testGZHB"/>
+                <entry key="01.1-008281" value-ref="testGZHC"/>
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="testLISClient" class="com.kingmed.lis.ws.client.LISClient" init-method="init">
+        <property name="companyCode" value="01.1"/>
+        <property name="companyName" value="广州金域医学检验中心"/>
+        <property name="ilisPortAddress" value="http://192.168.4.46:60080/GZWSTEST/Lis.dll/soap/ilis"/>
+        <property name="hospitalCache" ref="hospitalCache"/>
+    </bean>
+    
+    <bean id="gzLISClient" class="com.kingmed.lis.ws.client.LISClient" init-method="init">
+        <property name="companyCode" value="01.1"/>
+        <property name="companyName" value="广州金域医学检验中心"/>
+        <property name="ilisPortAddress" value="http://192.168.4.46:60080/GZWS/Lis.dll/soap/ilis"/>
+        <property name="hospitalCache" ref="hospitalCache"/>
+    </bean>
+    
     <camelContext xmlns="http://camel.apache.org/schema/blueprint">
         
         <propertyPlaceholder id="placeholder" location="classpath:sql.properties"/>
-        <!--        <route id="generateOrder-route">
-            <from uri="timer:foo?period=5s"/>
-            <transform>
-                <method ref="orderBean" method="generateRandomOrder"/>
-            </transform>
-            <to uri="sql:{{sql.insertOrder}}"/>
-            <log message="Inserted a new order of ${body[item]}"/>
-        </route>-->
-
-        <!-- route that process the orders by picking up new rows from the database
-        and when done processing then update the row to mark it as processed -->
-      
-        <!--        <route id="processOrder-route">
-            <from uri="sql:{{sql.selectOrder}}?consumer.onConsume={{sql.markOrder}}"/>
-            <to uri="bean:orderBean?method=processOrder"/>
-            <log message="${body}"/>
-        </route>-->
-        
         <!-- 转换标本信息 -->
         <route id="uploadSpec1-route">
             <from uri="sql:{{sql.selectSpecRcved}}?consumer.onConsume={{sql.markSpec}}"/>
@@ -81,7 +110,7 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
         </route>
         <!-- 上传标本信息 写入到消息队列 -->
         <route id="uploadSpec2-route">
-            <from uri="sql:{{sql.selectMsg}}?consumer.onConsume={{sql.markMsgSucess}}"/>
+            <from uri="sql:{{sql.selectMsg}}?consumer.onConsume={{sql.markSpecOut}}"/>
             <setBody>
                 <simple>${body[msg]}</simple>
             </setBody>
@@ -93,16 +122,25 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
         <route id="uploadSpec3-route">
             <from uri="activemq:queue:q_test" />
             <to uri="bean:specimenBean" />
+            <to uri="activemq:queue:q_test_res" />
         </route>
         
-        <route>
-            <from uri="timer://myTimer?fixedRate=true&amp;period=2000" />
-            <bean ref="lisClient" method="login"/>
-            <to uri="activemq:queue:q_test" />
+        <!-- 上传标本信息，将返回信息从消息队列写入到yuyt中 -->
+        <route id="uploadSpec4-route">
+            <from uri="activemq:queue:q_test_res" />
+            <to uri="bean:specimenResponseBean" />
+            <log message="标本信息已经上传到LIS，${body}"/>
+            <to uri="sql:{{sql.markSpecPlaced}}" />
+            <log message="已经更新消息的状态，已经上传消息到LIS,${body}"/>
+            <to uri="sql:{{sql.markSpecTesting}}" />
+            <log message="已经更新标本的状态，检测中,${body}"/>
+            <to uri="sql:{{sql.markSpecReporting}}" />
+            <log message="已经更新报告单，可查询报告单,${body}"/>
         </route>
-        <!--        <route id="uploadSpec-route">
+        
+<!--        <route>
             <from uri="timer://myTimer?fixedRate=true&amp;period=2000" />
-            <bean ref="myTransform" method="transform"/>
+            <bean ref="testLISClient" method="login"/>
             <to uri="activemq:queue:q_test" />
         </route>-->
     </camelContext>

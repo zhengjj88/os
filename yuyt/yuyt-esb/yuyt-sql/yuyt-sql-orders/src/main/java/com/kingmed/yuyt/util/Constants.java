@@ -1,7 +1,7 @@
 /**
  * Lincensed to Kingmed
  */
-package com.kingmed.yuyt.sql;
+package com.kingmed.yuyt.util;
 
 /**
  *
@@ -24,5 +24,11 @@ public class Constants {
     public static final String PRE_COMPANY_CODE="C-";//子公司代码前缀
     
     public static final String KMBARCODE_SPLITTER="-";//金域条码分隔符
+    
+    public static final String LIS_F_SID="201";//LIS 无效的SID    
+    
+    public static final String LIS_S="0";//LIS 上传标本信息成功
+    
+    public static final String F_EXCEPTION="E";//异常退出
     
 }

@@ -21,7 +21,6 @@ public class ILisProxy implements com.kingmed.lis.ws.ILis {
           ((javax.xml.rpc.Stub)iLis)._setProperty("javax.xml.rpc.service.endpoint.address", _endpoint);
         else
           _endpoint = (String)((javax.xml.rpc.Stub)iLis)._getProperty("javax.xml.rpc.service.endpoint.address");
-        System.out.println(_endpoint);
       }
       
     }

@@ -1,16 +1,16 @@
 /**
  * Licensed to the Kingmed .
  */
-package com.kingmed.yuyt.sql;
+package com.kingmed.yuyt.bean;
 
+import com.kingmed.yuyt.util.Constants;
 import com.kingmed.lis.ws.client.LISClient;
 import com.kingmed.yuyt.util.XMLHandler;
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -37,14 +37,17 @@ public class SpecimenBean implements Processor {
         this.lisClients = lisClients;
     }
 
+    public Map<String, LISClient> getLisClients() {
+        return lisClients;
+    }
+
     @Override
     public void process(Exchange msg) throws Exception {
         log.trace("处理上传标本，消息 {}", msg);
         String record = msg.getIn().getBody(String.class);
         log.info("处理上传标本，记录 {}", record);
         
-        /*
-        Map<String, String> paramMap = XMLHandler.transXmltoMap(record);
+        Map<String, String> paramMap = XMLHandler.transXmltoMapForSpec(record);
         String companyCode = null;
         String hospCode = null;
 
@@ -52,14 +55,26 @@ public class SpecimenBean implements Processor {
         String docId = paramMap.get("docId") != null ? paramMap.get("docId") : null;
         companyCode = paramMap.get("companyCode") != null ? paramMap.get("companyCode") : null;
         hospCode = paramMap.get("hospCode") != null ? paramMap.get("hospCode") : null;
-        String requestInfoXml = paramMap.get("requestInfoXml") != null ? paramMap.get("requestInfoXml") : null;
+        String specimen = paramMap.get("specimen") != null ? paramMap.get("specimen") : null;
+        //requestInfoXml = URLDecoder.decode(requestInfoXml,"UTF-8");
         String domainUserId = paramMap.get("domainUserId") != null ? paramMap.get("domainUserId") : null;
         String applicationId = paramMap.get("applicationId") != null ? paramMap.get("applicationId") : null;
         String errorMsg = null;
-        LISClient lisClient = this.lisClients.get(companyCode + "-" + hospCode);
-        lisClient.sendRequestInfo(requestInfoXml);
-        */
-        // Do something useful with this record.
+
+        LISClient lisClient = this.lisClients.get(companyCode);//根据子公司查询lis客户端
+        String r = lisClient.sendRequestInfo(hospCode, specimen);
+        if(!r.equals(Constants.LIS_S)){
+            throw new Exception("上传标本信息失败");
+        }
+        StringBuilder res = new StringBuilder();
+        res.append("<response>")
+           .append("<src>").append("LIS").append("</src>")
+           .append("<dest>").append("yuyt").append("</dest>")
+           .append("<tranType>").append("u_spec").append("</tranType>")     
+           .append("<docId>").append(docId).append("</docId>")
+           .append("<status>").append(r).append("</status>")
+           .append("</response>");
+        msg.getOut().setBody(res.toString());
     }
 
     /**
@@ -67,7 +82,7 @@ public class SpecimenBean implements Processor {
      *
      * @param spec
      */
-    public void convertSpecimen(Map<String, Object> spec) {
+    public void convertSpecimen(Map<String, Object> spec) throws UnsupportedEncodingException {
         String docid = (String) spec.get("id");
         String userId = (String) spec.get("author");
         String applicationId = (String) spec.get("applicationid");
@@ -116,8 +131,9 @@ public class SpecimenBean implements Processor {
         String sexStr = getSexByCode(sex);
 
         String registrationtimeStr = DF_CREATE_DATE.format(new Date(registrationtime.getTime()));
-
-        String patientInfoXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+        
+        String patientInfoXml="";
+        //String patientInfoXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
         patientInfoXml += "<Data>";
         patientInfoXml += "<Data_Row>";
         patientInfoXml += "<biztype>" + Constants.BIZTYPE + "</biztype>";
@@ -164,8 +180,10 @@ public class SpecimenBean implements Processor {
         strXml += "<domainUserId>" + userId + "</domainUserId>";
         strXml += "<applicationId>" + applicationId + "</applicationId>";
         strXml += "<docId>" + docid + "</docId>";
-        strXml += "<requestInfoXml>" + patientInfo + "</requestInfoXml>";    // 病人样本信息按URLEncode进行编码
+        strXml += "<specimen>" + patientInfo + "</specimen>"; 
         strXml += "</Data>";
+
+        //String msg = URLEncoder.encode(strXml, "UTF-8");
 
         //upload
         spec.put("docid", docid);
