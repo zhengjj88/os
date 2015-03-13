@@ -94,20 +94,19 @@ public class LISClient {
         Hospital hospital = hospitalCache.get(this.companyCode, hospCode);
         if (sid == null) {
             this.login(hospital);
-            
             sid = SIDCache.getInstance().get(companyCode, hospCode);
-            if(sid == null){
-                logger.error("SID为空，登录但是无法获取LIS的SID" + ",companyCode" + companyCode + "hospCode=" + hospCode );
+            if (sid == null) {
+                logger.error("SID为空，登录但是无法获取LIS的SID" + ",companyCode" + companyCode + "hospCode=" + hospCode);
                 return Constants.F_EXCEPTION;
             }
         }
-        
+
         String resultMsg;
         String head = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-        specimen = head +specimen;
+        specimen = head + specimen;
         try {
             resultMsg = iLis.sendRequestInfo(sid, specimen);
-            logger.info("上传标本信息结果"+resultMsg);
+            logger.info("上传标本信息结果" + resultMsg);
         } catch (RemoteException e) {
             logger.error("上传标本信息失败" + ",地址" + ilisPortAddress + "报文=" + specimen + ",", e);
             return Constants.F_EXCEPTION;
@@ -116,15 +115,15 @@ public class LISClient {
         if (resultMsg.contains(Constants.LIS_F_SID)) {// 发送失败，无效的SID，重试登录之后上传一次
             //登录
             this.login(hospital);
-            
+
             sid = SIDCache.getInstance().get(companyCode, hospCode);
-            if(sid == null){
-                logger.error("会话失效，重登录但是无法获取LIS的SID" + ",companyCode" + companyCode + "hospCode=" + hospCode );
+            if (sid == null) {
+                logger.error("会话失效，重登录但是无法获取LIS的SID" + ",companyCode" + companyCode + "hospCode=" + hospCode);
                 return Constants.F_EXCEPTION;
             }
             try {
                 resultMsg = iLis.sendRequestInfo(sid, specimen);
-                logger.info("重登录后，上传标本信息结果"+resultMsg);
+                logger.info("重登录后，上传标本信息结果" + resultMsg);
             } catch (RemoteException e) {
                 logger.error("上传标本信息失败", e);
                 return Constants.F_EXCEPTION;
@@ -138,13 +137,60 @@ public class LISClient {
         if (Constants.LIS_S.equals(resultMsg)) {
             r = Constants.LIS_S;
             logger.info("上传标本成功");
-        }else{
+        } else {
             logger.info("上传标本失败");
         }
         return r;
     }
 
-    public void login(Hospital hospital) {
+    public String sendRequest4QueryReport(String hospCode, String kmbarcode) throws Exception {
+        logger.info("查询报告单");
+        String re = null;
+        String sid = SIDCache.getInstance().get(companyCode, hospCode);
+        Hospital hospital = hospitalCache.get(this.companyCode, hospCode);
+        if (sid == null) {
+            sid = this.login(hospital);
+            this.validateSID(sid, hospCode);
+        }
+
+        StringHolder resultInfo = new StringHolder();
+        StringHolder _return = new StringHolder();
+        try {
+            iLis.queryReport(sid, kmbarcode, resultInfo, _return);
+        } catch (RemoteException e) {
+            String msg = "查询报告单失败" + ",地址" + ilisPortAddress + "报文=" + kmbarcode + ",";
+            logger.error(msg, e);
+            throw new Exception(msg);
+        }
+        String rv = _return.value;
+        if (Constants.LIS_F_SID.equals(rv)) {// 发送失败，无效的SID，重试登录之后上传一次
+            sid = this.login(hospital);
+            this.validateSID(sid, hospCode);
+            iLis.queryReport(sid, kmbarcode, resultInfo, _return);
+        }
+
+        rv = _return.value;
+        if (Constants.LIS_S.equals(rv)) {               //已经查询到报告单
+            StringBuilder sb = new StringBuilder();
+            sb.append("<lis_status>").append(rv).append("</lis_status>")
+              .append(resultInfo.value);
+            re = sb.toString();
+        } else if (Constants.LIS_EMPTY.equals(rv)) {    //表示查询结果为空，报告单不存在或者实验室退单
+            iLis.queryRequestDetail(sid, kmbarcode, resultInfo, _return);//检测是否退单
+            StringBuilder sb = new StringBuilder();
+            sb.append("<lis_status>").append(rv).append("</lis_status>")
+              .append(resultInfo.value);
+            re = sb.toString();
+        }else {                                         //未知返回代码
+            StringBuilder sb = new StringBuilder();
+            sb.append("<lis_status>").append(rv).append("</lis_status>")
+              .append(resultInfo.value);
+            re = sb.toString();
+        }
+        return re;
+    }
+
+    public String login(Hospital hospital) {
         String hospCode = hospital.getCode();
         String username = hospital.getLisUsername();
         String password = hospital.getLisPassword();
@@ -156,16 +202,23 @@ public class LISClient {
             iLis.login(username, password, operator, isInterface, SID, _return);
         } catch (RemoteException e) {
             logger.error("登录LIS失败,用户名" + username + ",地址" + ilisPortAddress, e);
-            return;
-            //return Constants.F_EXCEPTION;
+            return null;
         }
         if (_return.value.equals("0")) {//登录成功
             String sid = SID.value;
             SIDCache.getInstance().set(companyCode, hospCode, sid);
+            return sid;
         } else {
             logger.error("登录LIS失败,用户名" + username + ",地址" + ilisPortAddress + ",return " + _return.value + ",SID" + SID.value);
-            return;
-            //return Constants.F_EXCEPTION;
+            return null;
+        }
+    }
+
+    private void validateSID(String sid, String hospCode) throws Exception {
+        if (sid == null) {
+            String msg = "SID为空，登录但是无法获取LIS的SID" + ",companyCode" + companyCode + "hospCode=" + hospCode;
+            logger.error(msg);
+            throw new Exception(msg);
         }
     }
 }

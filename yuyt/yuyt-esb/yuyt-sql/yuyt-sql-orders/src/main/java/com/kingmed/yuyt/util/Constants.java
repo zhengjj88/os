@@ -29,6 +29,19 @@ public class Constants {
     
     public static final String LIS_S="0";//LIS 上传标本信息成功
     
+    public static final String LIS_EMPTY="211";//LIS 上传标本信息成功
+    
     public static final String F_EXCEPTION="E";//异常退出
     
+    public static final String MSG_TYPE_UPLOAD_SPECIMEN="US";// 消息类型，上传标本
+    public static final String MSG_TYPE_QUERY_REPORT="QR";// 消息类型，查询报告单
+    public static final String MSG_TYPE_QUERY_REPORT_RESPONSE="QR_RES";// 消息类型，查询报告单
+    public static final String APP_LIS="LIS";// 消息类型，查询报告单
+    public static final String APP_YUYT="YUYT";// 消息类型，查询报告单
+    
+    public static final String POSITIVE="POSITIVE";
+    public static final String POSITIVE_Y="Y";
+    public static final String POSITIVE_N="N";
+    public static final String POSITIVE_U="U";//未知阳性、阴性
+        
 }

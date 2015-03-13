@@ -68,9 +68,9 @@ public class SpecimenBean implements Processor {
         }
         StringBuilder res = new StringBuilder();
         res.append("<response>")
-           .append("<src>").append("LIS").append("</src>")
-           .append("<dest>").append("yuyt").append("</dest>")
-           .append("<tranType>").append("u_spec").append("</tranType>")     
+           .append("<src>").append(Constants.APP_LIS).append("</src>")
+           .append("<dest>").append(Constants.APP_YUYT).append("</dest>")
+           .append("<tranType>").append(Constants.MSG_TYPE_UPLOAD_SPECIMEN).append("</tranType>")     
            .append("<docId>").append(docId).append("</docId>")
            .append("<status>").append(r).append("</status>")
            .append("</response>");
@@ -133,7 +133,6 @@ public class SpecimenBean implements Processor {
         String registrationtimeStr = DF_CREATE_DATE.format(new Date(registrationtime.getTime()));
         
         String patientInfoXml="";
-        //String patientInfoXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
         patientInfoXml += "<Data>";
         patientInfoXml += "<Data_Row>";
         patientInfoXml += "<biztype>" + Constants.BIZTYPE + "</biztype>";
@@ -170,7 +169,6 @@ public class SpecimenBean implements Processor {
         patientInfoXml += "</Data>";
 
         String patientInfo = patientInfoXml;
-        //patientInfo = urlUtil.urlEncoding(patientInfoXml, "utf-8");
 
         String strXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
         strXml += "<Data>";
@@ -183,11 +181,10 @@ public class SpecimenBean implements Processor {
         strXml += "<specimen>" + patientInfo + "</specimen>"; 
         strXml += "</Data>";
 
-        //String msg = URLEncoder.encode(strXml, "UTF-8");
-
         //upload
         spec.put("docid", docid);
         spec.put("enable", Constants.ENABLE_YES);
+        spec.put("msg_type", Constants.MSG_TYPE_UPLOAD_SPECIMEN);
         spec.put("sub_company", companycode);
         spec.put("hospital", hospitalcode);
         spec.put("km_barcode", kmbarcode);

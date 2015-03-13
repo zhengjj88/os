@@ -26,9 +26,8 @@ public class SpecimenResponseBean implements Processor {
         String record = msg.getIn().getBody(String.class);
         logger.info("处理上传标本的返回值，记录 {}", record);
         
-        Map<String, String> map = XMLHandler.transXmltoMapForSpecRes(record);
+        Map<String, String> map = XMLHandler.transSimpleXmltoMap(record);
         String status = map.get("status");
-        String docId = map.get("docId");
         if(status.equals(Constants.LIS_S)){
             msg.getOut().setBody(map);
         }

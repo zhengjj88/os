@@ -2,7 +2,6 @@
 <!--
 
     Licensed to Kingmed
-
 -->
 <blueprint
     xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
@@ -21,6 +20,37 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
         </property>
     </bean>
     <bean id="specimenResponseBean" class="com.kingmed.yuyt.bean.SpecimenResponseBean"/>
+    <bean id="reportBean" class="com.kingmed.yuyt.bean.ReportBean">
+        <property name="lisClients">
+            <map>
+                <entry key="01.1" value-ref="gzLISClient"/>
+            </map>
+        </property>
+    </bean>
+    <bean id="reportResponseBean" class="com.kingmed.yuyt.bean.ReportResponseBean">
+        <property name="hpvHighRish17">
+            <list>
+                <value>人乳头瘤病毒16型</value>
+                <value>人乳头瘤病毒18型</value>
+                <value>人乳头瘤病毒26型</value>
+                <value>人乳头瘤病毒31型</value>
+                <value>人乳头瘤病毒33型</value>
+                <value>人乳头瘤病毒35型</value>
+                <value>人乳头瘤病毒39型</value>
+                <value>人乳头瘤病毒45型</value>
+                <value>人乳头瘤病毒51型</value>
+                <value>人乳头瘤病毒52型</value>
+                <value>人乳头瘤病毒53型</value>
+                <value>人乳头瘤病毒56型</value>
+                <value>人乳头瘤病毒58型</value>
+                <value>人乳头瘤病毒59型</value>
+                <value>人乳头瘤病毒66型</value>
+                <value>人乳头瘤病毒68型</value>
+                <value>人乳头瘤病毒82型</value>
+            </list>
+        </property>
+    </bean>
+    
     <bean id="myTransform" class="com.kingmed.yuyt.msg.MyTransform">
         <property name="prefix" value="${prefix}" />
     </bean>
@@ -43,6 +73,13 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
     <reference id="connectionFactory" interface="javax.jms.ConnectionFactory" />
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
         <property name="brokerURL" value="failover:(tcp://192.168.2.164:61616,tcp://192.168.2.164:61617,tcp://192.168.2.164:61618,tcp://192.168.2.164:61619)"/>
+    </bean>
+    <bean id="pgz" class ="com.kingmed.yuyt.model.Hospital">
+        <property name="companyCode" value=""/>
+        <property name="code" value=""/>
+        <property name="name" value=""/>
+        <property name="lisUsername" value=""/>
+        <property name="lisPassword" value=""/>
     </bean>
     
     <bean id="testGZ" class ="com.kingmed.yuyt.model.Hospital">
@@ -83,6 +120,13 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
             </map>
         </property>
     </bean>
+    <bean id = "phospitalCache" class="com.kingmed.yuyt.cache.HospitalCache">
+        <property name="cache">
+            <map>
+                <entry key="01.1-01.12.0054" value-ref="pgz"/>
+            </map>
+        </property>
+    </bean>
     
     <bean id="testLISClient" class="com.kingmed.lis.ws.client.LISClient" init-method="init">
         <property name="companyCode" value="01.1"/>
@@ -95,7 +139,7 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
         <property name="companyCode" value="01.1"/>
         <property name="companyName" value="广州金域医学检验中心"/>
         <property name="ilisPortAddress" value="http://192.168.4.46:60080/GZWS/Lis.dll/soap/ilis"/>
-        <property name="hospitalCache" ref="hospitalCache"/>
+        <property name="hospitalCache" ref="phospitalCache"/>
     </bean>
     
     <camelContext xmlns="http://camel.apache.org/schema/blueprint">
@@ -125,7 +169,7 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
             <to uri="activemq:queue:q_test_res" />
         </route>
         
-        <!-- 上传标本信息，将返回信息从消息队列写入到yuyt中 -->
+        <!-- 上传标本信息，将返回信息从消息队列写入到域医通数据库中 -->
         <route id="uploadSpec4-route">
             <from uri="activemq:queue:q_test_res" />
             <to uri="bean:specimenResponseBean" />
@@ -137,11 +181,46 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
             <to uri="sql:{{sql.markSpecReporting}}" />
             <log message="已经更新报告单，可查询报告单,${body}"/>
         </route>
+       
+        <!-- 查询报告单，组装报文 -->
+        <route id="queryReport1-route">
+            <from uri="sql:{{sql.selectQueryReport}}"/>
+            <to uri="bean:reportBean?method=convertReport"/>
+            <to uri="sql:{{sql.insertLog}}"/>
+            <log message="已经转换查询报告单的报文信息 ${body[id]}"/>
+        </route>
+        <!-- 查询报告单，从域医通数据库写入到消息队列 -->
+        <route id="queryReport2-route">
+            <from uri="sql:{{sql.selectMsgQR}}?consumer.onConsume={{sql.markMsgQROut}}"/>
+            <setBody>
+                <simple>${body[msg]}</simple>
+            </setBody>
+            <to uri="activemq:queue:q_qr_req" />
+            <log message="查询报告单报文已经到MQ ${body}"/>
+        </route>
+        <!-- 查询报告单，从LIS写入到消息队列 -->
+        <route id="queryReport3-route">
+            <from uri="activemq:queue:q_qr_req" />
+            <to uri="bean:reportBean" />
+            <to uri="activemq:queue:q_qr_res" />
+        </route>
+        <!-- 查询报告单，将返回信息从消息队列写入到域医通数据库中 -->
+        <route id="queryReport4-route">
+            <from uri="activemq:queue:q_qr_res" />
+            <to uri="bean:reportResponseBean" />
+            <log message="报告单已经上传到LIS，${body[docid]}"/>
+            <choice>
+                <when>
+                    <simple>${body[isReimbu]} != null</simple>
+                    <log message="实验室退单"/>
+                </when>
+                <when>
+                    <simple>${body[lis_status]} == '0' </simple>
+                    <log message="报告单不为空，将报告单内容插入日志"/>
+                    <to uri="sql:{{sql.insertLog}}"/>
+                </when>
+            </choice>
+        </route>
         
-<!--        <route>
-            <from uri="timer://myTimer?fixedRate=true&amp;period=2000" />
-            <bean ref="testLISClient" method="login"/>
-            <to uri="activemq:queue:q_test" />
-        </route>-->
     </camelContext>
 </blueprint>
