@@ -1,40 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Licensed to the Apache Software Foundation (ASF) under one or more
-    contributor license agreements.  See the NOTICE file distributed with
-    this work for additional information regarding copyright ownership.
-    The ASF licenses this file to You under the Apache License, Version 2.0
-    (the "License"); you may not use this file except in compliance with
-    the License.  You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+    Licensed to Kingmed
 
 -->
 <blueprint
         xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+        xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
         xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
 
-    <cm:property-placeholder id="myblueprint.placeholder" persistent-id="com.kingmed.yuyt.sql">
+    <cm:property-placeholder id="myblueprint.placeholder" persistent-id="com.kingmed.yuyt"  update-strategy="reload">
         <cm:default-properties>
-            <cm:property name="oracle_username" value=""/>
-            <cm:property name="oracle_password" value=""/>
-            <cm:property name="oracle_database" value="yuytdb"/>
         </cm:default-properties>
     </cm:property-placeholder>
 
 
     <bean id="yuytDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
-        <property name="url" value="jdbc:oracle:thin:@192.168.0.152:1521:testz"/>
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${jdbc-url}"/>
         <property name="username" value="${oracle_username}"/>
         <property name="password" value="${oracle_password}"/>
     </bean>
@@ -46,8 +30,8 @@
 
     <service ref="yuytDataSource" interface="javax.sql.DataSource">
         <service-properties>
-            <entry key="datasource.name" value="yuyt"/>
-            <entry key="datasource.type" value="Oracle"/>
+            <entry key="datasource.name" value="${datasource_name}"/>
+            <entry key="datasource.type" value="${datasource_type}"/>
         </service-properties>
     </service>
 

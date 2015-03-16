@@ -10,6 +10,9 @@ import com.kingmed.lis.ws.ILisProxy;
 import java.rmi.RemoteException;
 import javax.xml.rpc.holders.StringHolder;
 import com.kingmed.yuyt.util.Constants;
+import com.kingmed.yuyt.util.XMLHandler;
+import java.util.List;
+import org.dom4j.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,10 +179,20 @@ public class LISClient {
               .append(resultInfo.value);
             re = sb.toString();
         } else if (Constants.LIS_EMPTY.equals(rv)) {    //表示查询结果为空，报告单不存在或者实验室退单
-            iLis.queryRequestDetail(sid, kmbarcode, resultInfo, _return);//检测是否退单
             StringBuilder sb = new StringBuilder();
-            sb.append("<lis_status>").append(rv).append("</lis_status>")
-              .append(resultInfo.value);
+            sb.append("<lis_status>").append(rv).append("</lis_status>");
+            
+            iLis.queryRequestDetail(sid, kmbarcode, resultInfo, _return);//检测是否退单
+            rv = _return.value;
+            sb.append("<lis_status1>").append(rv).append("</lis_status1>");
+            if (Constants.LIS_S.equals(rv)) {  //实验室已退单
+                List<Node> nodes = XMLHandler.query(resultInfo.value, "/Data/Data_Row[IsReimbu=1]");
+                if(nodes != null && nodes.size()>0){
+                    sb.append("<IsReimbu>").append(Constants.LIS_ISREIMBU_Y).append("</IsReimbu>");
+                }else{
+                    sb.append("<IsReimbu>").append(Constants.LIS_ISREIMBU_N).append("</IsReimbu>");
+                }
+            }
             re = sb.toString();
         }else {                                         //未知返回代码
             StringBuilder sb = new StringBuilder();

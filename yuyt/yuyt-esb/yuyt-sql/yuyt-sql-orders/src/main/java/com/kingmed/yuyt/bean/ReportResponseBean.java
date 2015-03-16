@@ -42,27 +42,29 @@ public class ReportResponseBean implements Processor {
         String record = msg.getIn().getBody(String.class);
 
         Map<String, Object> map = XMLHandler.transXmltoMapForReport(record);
-
+        String lis_status=(String)map.get("lis_status");
+        String lis_status1=(String)map.get("lis_status1");
+        String IsReimbu=(String)map.get("IsReimbu");
         map.put("enable", Constants.ENABLE_YES);
         map.put("msg_type", Constants.MSG_TYPE_QUERY_REPORT_RESPONSE);
         map.put("direction", Constants.MSG_IN);
-        map.put("msg", map.get("Data"));
+        map.put("msg", map.get("Data"));//<Data></Data>
         map.put("create_time", new Timestamp(System.currentTimeMillis()));
         map.put("status", Constants.MSG_STATUS_NEW);//创建成功
 
         //检测
-        checkPositive(map);
+        
+        if(Constants.LIS_S.equals(lis_status)){//成功查询到报告单
+            checkPositive(map);
+            String data = (String) map.get("Data");
+            Map<String, String> m = XMLHandler.transSimpleXmltoMap(data);
+            String Report = m.get("Report");
+            map.put("reportfile", Report);
+        }
         msg.getOut().setBody(map);
 
     }
 
-    public static void main(String[] args) throws Exception{
-        Map <String,Object> map = new HashMap<String,Object>();
-        String xml="";
-        map.put("msg", xml);
-        new ReportResponseBean().checkPositive(map);
-    }
-    
     /**
      * 增加阳性标示
      * @param map
@@ -82,7 +84,7 @@ public class ReportResponseBean implements Processor {
         String naturalItemName = node.getText();
         String singleItemName =null;
         List<Element> cpElms = doc.selectNodes(cp);
-        map.put(Constants.POSITIVE, Constants.POSITIVE_U);
+        map.put(Constants.POSITIVE, Constants.POSITIVE_X);
         if (cpElms != null && cpElms.size() > 0) {            
             String positive = checkPositive4CP(doc, expResult);
             map.put(Constants.POSITIVE, positive);

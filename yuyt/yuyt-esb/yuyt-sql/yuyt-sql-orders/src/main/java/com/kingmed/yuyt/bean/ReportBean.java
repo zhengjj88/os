@@ -42,7 +42,7 @@ public class ReportBean implements Processor {
         
         companyCode = paramMap.get("companyCode") != null ? paramMap.get("companyCode") : null;
         hospCode = paramMap.get("hospCode") != null ? paramMap.get("hospCode") : null;
-        String docId = paramMap.get("docId") != null ? paramMap.get("docId") : null;
+        String doc_id = paramMap.get("doc_id") != null ? paramMap.get("doc_id") : null;
         
         String requestCode = paramMap.get("requestCode") != null ? paramMap.get("requestCode") : null;
         
@@ -51,7 +51,7 @@ public class ReportBean implements Processor {
         t = t.replace("<?xml version=\"1.0\" encoding=\"gb2312\"?>", "");
         StringBuilder res = new StringBuilder();
         res.append("<response>")
-           .append("<docid>").append(docId).append("</docid>")
+           .append("<doc_id>").append(doc_id).append("</doc_id>")
            .append("<src>").append(Constants.APP_LIS).append("</src>")
            .append("<dest>").append(Constants.APP_YUYT).append("</dest>")
            .append("<sub_company>").append(companyCode).append("</sub_company>")
@@ -65,7 +65,7 @@ public class ReportBean implements Processor {
     }
     
     public void convertReport(Map<String, Object> data){
-        String docId = (String) data.get("id");
+        String doc_id = (String) data.get("doc_id");
         String kmbarcode = (String)data.get("item_p_kmbarcode");
         String hospitalcode = (String) data.get("item_p_hospitalcode");
         String companycode = (String) data.get("item_p_companycode");
@@ -75,11 +75,11 @@ public class ReportBean implements Processor {
         msg += "<Data>";
         msg += "<hospCode>" + hospitalcode + "</hospCode>";
         msg += "<companyCode>" + companycode + "</companyCode>";
-        msg += "<docId>" + docId + "</docId>";
+        msg += "<doc_id>" + doc_id + "</doc_id>";
         msg += "<requestCode>" + kmbarcode + "</requestCode>";
         msg += "</Data>";
         
-        data.put("docid", docId);
+        data.put("doc_id", doc_id);
         data.put("enable", Constants.ENABLE_YES);
         data.put("msg_type", Constants.MSG_TYPE_QUERY_REPORT);
         data.put("sub_company", companycode);

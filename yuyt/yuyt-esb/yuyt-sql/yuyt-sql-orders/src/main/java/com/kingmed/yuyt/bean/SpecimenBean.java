@@ -52,7 +52,7 @@ public class SpecimenBean implements Processor {
         String hospCode = null;
 
         String systemCode = paramMap.get("systemCode") != null ? paramMap.get("systemCode") : null;
-        String docId = paramMap.get("docId") != null ? paramMap.get("docId") : null;
+        String doc_id = paramMap.get("doc_id") != null ? paramMap.get("doc_id") : null;
         companyCode = paramMap.get("companyCode") != null ? paramMap.get("companyCode") : null;
         hospCode = paramMap.get("hospCode") != null ? paramMap.get("hospCode") : null;
         String specimen = paramMap.get("specimen") != null ? paramMap.get("specimen") : null;
@@ -71,7 +71,7 @@ public class SpecimenBean implements Processor {
            .append("<src>").append(Constants.APP_LIS).append("</src>")
            .append("<dest>").append(Constants.APP_YUYT).append("</dest>")
            .append("<tranType>").append(Constants.MSG_TYPE_UPLOAD_SPECIMEN).append("</tranType>")     
-           .append("<docId>").append(docId).append("</docId>")
+           .append("<doc_id>").append(doc_id).append("</doc_id>")
            .append("<status>").append(r).append("</status>")
            .append("</response>");
         msg.getOut().setBody(res.toString());
@@ -83,7 +83,7 @@ public class SpecimenBean implements Processor {
      * @param spec
      */
     public void convertSpecimen(Map<String, Object> spec) throws UnsupportedEncodingException {
-        String docid = (String) spec.get("id");
+        String doc_id = (String) spec.get("doc_id");
         String userId = (String) spec.get("author");
         String applicationId = (String) spec.get("applicationid");
         String checktype = (String) spec.get("item_p_checktype");
@@ -177,12 +177,12 @@ public class SpecimenBean implements Processor {
         strXml += "<companyCode>" + companycode + "</companyCode>";
         strXml += "<domainUserId>" + userId + "</domainUserId>";
         strXml += "<applicationId>" + applicationId + "</applicationId>";
-        strXml += "<docId>" + docid + "</docId>";
+        strXml += "<doc_id>" + doc_id + "</doc_id>";
         strXml += "<specimen>" + patientInfo + "</specimen>"; 
         strXml += "</Data>";
 
         //upload
-        spec.put("docid", docid);
+        spec.put("doc_id", doc_id);
         spec.put("enable", Constants.ENABLE_YES);
         spec.put("msg_type", Constants.MSG_TYPE_UPLOAD_SPECIMEN);
         spec.put("sub_company", companycode);
