@@ -29,7 +29,7 @@ public class Constants {
     
     public static final String LIS_S="0";//LIS 上传标本信息成功
     
-    public static final String LIS_EMPTY="211";//LIS 上传标本信息成功
+    public static final String LIS_EMPTY="211";//报告单未出
     
     public static final String LIS_ISREIMBU_Y="1";//LIS退单
     public static final String LIS_ISREIMBU_N="0";//LIS未退单

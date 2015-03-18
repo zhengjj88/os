@@ -10,12 +10,10 @@
         xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
         xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd">
 
-    <cm:property-placeholder id="myblueprint.placeholder" persistent-id="com.kingmed.yuyt"  update-strategy="reload">
+    <cm:property-placeholder id="myblueprint.placeholder" persistent-id="com.kingmed.yuyt">
         <cm:default-properties>
         </cm:default-properties>
     </cm:property-placeholder>
-
-
     <bean id="yuytDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="${driverClassName}"/>
         <property name="url" value="${jdbc-url}"/>

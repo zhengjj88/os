@@ -20,7 +20,6 @@ import org.dom4j.Node;
 public class XMLHandler {
 
     //将xml文件的内容解析成Document，并存入hashMap对象中(单行数据）
-
     public static Map<String, String> transXmltoMapForSpec(String xmlInfo) throws DocumentException {
         Document doc = DocumentHelper.parseText(xmlInfo); // 将字符串转为xml
         Map<String, String> map = new HashMap<String, String>();
@@ -44,9 +43,15 @@ public class XMLHandler {
             Element dataElement = (Element) iter.next();
             map.put(dataElement.getName(), dataElement.getText());
         }
-        Element e = (Element) (rootElt.element("Data").elements().get(0));
-
-        map.put("Data", "<Data>" + e.asXML() + "</Data>");
+        Element e = (Element) (rootElt.element("Data"));
+        String data = "";
+        if (e != null) {
+            data = ((Element) e.elements().get(0)).asXML();
+            map.put("Data", "<Data>" + data + "</Data>");
+        } else {
+            data = xmlInfo;
+            map.put("Data", data);
+        }
         return map;
     }
 
@@ -61,8 +66,8 @@ public class XMLHandler {
         }
         return map;
     }
-    
-    public static List<Node> query(String xml, String xpath) throws DocumentException{
+
+    public static List<Node> query(String xml, String xpath) throws DocumentException {
         List<Node> nodes = null;
         Document doc = DocumentHelper.parseText(xml);
         nodes = doc.selectNodes(xpath);

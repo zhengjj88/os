@@ -57,7 +57,7 @@ public class ReportBean implements Processor {
            .append("<sub_company>").append(companyCode).append("</sub_company>")
            .append("<hospital>").append(hospCode).append("</hospital>")
            .append("<km_barcode>").append(requestCode).append("</km_barcode>")
-           .append("<msg_type>").append(Constants.MSG_TYPE_QUERY_REPORT).append("</msg_type>")     
+           .append("<msg_type>").append(Constants.MSG_TYPE_QUERY_REPORT_RESPONSE).append("</msg_type>")     
            .append(t)
            .append("</response>");
         

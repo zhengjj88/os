@@ -29,9 +29,6 @@ public class LISClient {
     private ILisProxy iLis = null;
     private static final Logger logger = LoggerFactory.getLogger(LISClient.class);
 
-    private boolean verbose = true;
-    private String prefix = "LIS";
-
     public void setCompanyCode(String companyCode) {
         this.companyCode = companyCode;
     }
@@ -178,7 +175,7 @@ public class LISClient {
             sb.append("<lis_status>").append(rv).append("</lis_status>")
               .append(resultInfo.value);
             re = sb.toString();
-        } else if (Constants.LIS_EMPTY.equals(rv)) {    //表示查询结果为空，报告单不存在或者实验室退单
+        } else if (rv.contains(Constants.LIS_EMPTY)) {    //表示查询结果为空，报告单不存在或者实验室退单
             StringBuilder sb = new StringBuilder();
             sb.append("<lis_status>").append(rv).append("</lis_status>");
             

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-
     Licensed to Kingmed
 -->
 <blueprint
@@ -11,16 +10,32 @@
     xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
 http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
-    <cm:property-placeholder persistent-id="com.kingmed.yuyt" update-strategy="reload">
+    <cm:property-placeholder persistent-id="com.kingmed.yuyt">
         <cm:default-properties>
-            <cm:property name="prefix" value="yuyt"/>
         </cm:default-properties>
     </cm:property-placeholder>
-    <bean id="orderBean" class="com.kingmed.yuyt.sql.OrderBean" init-method="init"/>
+    <reference id="yuytDataSource" interface="javax.sql.DataSource" filter="(datasource.name=yuyt)">
+        <reference-listener bind-method="onBind" unbind-method="onUnbind">
+            <bean class="com.kingmed.yuyt.sql.ListenerBean"/>
+        </reference-listener>
+    </reference>
+    <bean id="sql" class="org.apache.camel.component.sql.SqlComponent">
+        <property name="dataSource" ref="yuytDataSource"/>
+    </bean>    
+    <reference id="connectionFactory" interface="javax.jms.ConnectionFactory" />
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="brokerURL" value="${mq_url}"/>
+    </bean>
+    <bean id="panZhiBean" class="com.kingmed.yuyt.bean.PanzhiBean" init-method="init">
+        <property name="orgId" value="${sms_orgid}"/>
+        <property name="username" value="${sms_username}"/>
+        <property name="password" value="${sms_password}"/>
+        <property name="serverUrl" value="${sms_server_url}"/>
+    </bean>
     <bean id="specimenBean" class="com.kingmed.yuyt.bean.SpecimenBean">
         <property name="lisClients">
             <map>
-                <entry key="${gz_lis_code}" value-ref="testLISClient"/>
+                <entry key="${gz_lis_code}" value-ref="gzLISClient"/>
             </map>
         </property>
     </bean>
@@ -59,93 +74,42 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
         <property name="panZhiBean" ref="panZhiBean"/>
     </bean>
     <bean id="smsResponseBean" class="com.kingmed.yuyt.bean.SMSResponseBean"/>
-    <bean id="panZhiBean" class="com.kingmed.yuyt.bean.PanzhiBean" init-method="init">
-        <property name="orgId" value="${sms_orgid}"/>
-        <property name="username" value="${sms_username}"/>
-        <property name="password" value="${sms_password}"/>
-        <property name="serverUrl" value="${sms_server_url}"/>
-    </bean>
-    <bean id="lisClient" class="com.kingmed.lis.ws.client.LISClient"/>
-    <reference id="yuytDataSource" interface="javax.sql.DataSource" filter="(datasource.name=yuyt)">
-        <reference-listener bind-method="onBind" unbind-method="onUnbind">
-            <bean class="com.kingmed.yuyt.sql.ListenerBean"/>
-        </reference-listener>
-    </reference>
-
-    <bean id="sql" class="org.apache.camel.component.sql.SqlComponent">
-        <property name="dataSource" ref="yuytDataSource"/>
-    </bean>
     
-    <reference id="connectionFactory" interface="javax.jms.ConnectionFactory" />
-    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
-        <property name="brokerURL" value="${mq_url}"/>
-    </bean>
-    <bean id="pgz" class ="com.kingmed.yuyt.model.Hospital">
+    <bean id="testGZ" class ="com.kingmed.yuyt.model.Hospital">
         <property name="companyCode" value=""/>
         <property name="code" value=""/>
-        <property name="name" value=""/>
+        <property name="name" value="广州金域测试医院"/>
         <property name="lisUsername" value=""/>
         <property name="lisPassword" value=""/>
     </bean>
-    
-    <bean id="testGZ" class ="com.kingmed.yuyt.model.Hospital">
+    <bean id="gzha" class ="com.kingmed.yuyt.model.Hospital">
         <property name="companyCode" value="01.1"/>
-        <property name="code" value="01.10.0010"/>
-        <property name="name" value="广州金域测试医院"/>
-        <property name="lisUsername" value="01.10.0010"/>
-        <property name="lisPassword" value="01100010"/>
-    </bean>
-    <bean id="testGZHA" class ="com.kingmed.yuyt.model.Hospital">
-        <property name="companyCode" value="01.1"/>
-        <property name="code" value="008279"/>
+        <property name="code" value="008363"/>
         <property name="name" value="广州医院A"/>
-        <property name="lisUsername" value="008279"/>
-        <property name="lisPassword" value="008279"/>
+        <property name="lisUsername" value=""/>
+        <property name="lisPassword" value=""/>
     </bean>
-    <bean id="testGZHB" class ="com.kingmed.yuyt.model.Hospital">
-        <property name="companyCode" value="${gz_lis_code}"/>
-        <property name="code" value="008280"/>
-        <property name="name" value="广州医院B"/>
-        <property name="lisUsername" value="008280"/>
-        <property name="lisPassword" value="008280"/>
-    </bean>
-    <bean id="testGZHC" class ="com.kingmed.yuyt.model.Hospital">
-        <property name="companyCode" value="${gz_lis_code}"/>
-        <property name="code" value="008281"/>
-        <property name="name" value="广州医院C"/>
-        <property name="lisUsername" value="008281"/>
-        <property name="lisPassword" value="008281"/>
+    <bean id="syha" class ="com.kingmed.yuyt.model.Hospital">
+        <property name="companyCode" value="10.1"/>
+        <property name="code" value=""/>
+        <property name="name" value="沈阳医院A"/>
+        <property name="lisUsername" value=""/>
+        <property name="lisPassword" value=""/>
     </bean>
     <bean id = "hospitalCache" class="com.kingmed.yuyt.cache.HospitalCache">
         <property name="cache">
             <map>
-                <entry key="01.1-01.10.0010" value-ref="testGZ"/>
-                <entry key="01.1-008279" value-ref="testGZHA"/>
-                <entry key="01.1-008280" value-ref="testGZHB"/>
-                <entry key="01.1-008281" value-ref="testGZHC"/>
+                <entry key="" value-ref="testGZ"/>
+                <entry key="" value-ref="gzha"/>
+                <entry key="" value-ref="syha"/>
             </map>
         </property>
     </bean>
-    <bean id = "phospitalCache" class="com.kingmed.yuyt.cache.HospitalCache">
-        <property name="cache">
-            <map>
-                <entry key="01.1-01.12.0054" value-ref="pgz"/>
-            </map>
-        </property>
-    </bean>
-    
-    <bean id="testLISClient" class="com.kingmed.lis.ws.client.LISClient" init-method="init">
-        <property name="companyCode" value="${gz_lis_code}"/>
-        <property name="companyName" value="广州金域医学检验中心"/>
-        <property name="ilisPortAddress" value="${gz_lis_test_address}"/>
-        <property name="hospitalCache" ref="hospitalCache"/>
-    </bean>
-    
     <bean id="gzLISClient" class="com.kingmed.lis.ws.client.LISClient" init-method="init">
         <property name="companyCode" value="${gz_lis_code}"/>
         <property name="companyName" value="广州金域医学检验中心"/>
         <property name="ilisPortAddress" value="${gz_lis_address}"/>
-        <property name="hospitalCache" ref="phospitalCache"/>
+        <property name="hospitalCache" ref="hospitalCache"/>
     </bean>
     
     <camelContext xmlns="http://camel.apache.org/schema/blueprint">
@@ -164,20 +128,20 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
             <setBody>
                 <simple>${body[msg]}</simple>
             </setBody>
-            <to uri="activemq:queue:q_test" />
+            <to uri="activemq:queue:q_specimen_req" />
             <log message="已经上传标本信息到MQ ${body}"/>
         </route>
         
         <!-- 上传标本信息，从消息队列写入到LIS中 -->
         <route id="uploadSpec3-route">
-            <from uri="activemq:queue:q_test" />
+            <from uri="activemq:queue:q_specimen_req" />
             <to uri="bean:specimenBean" />
-            <to uri="activemq:queue:q_test_res" />
+            <to uri="activemq:queue:q_specimen_res" />
         </route>
         
         <!-- 上传标本信息，将返回信息从消息队列写入到域医通数据库中 -->
         <route id="uploadSpec4-route">
-            <from uri="activemq:queue:q_test_res" />
+            <from uri="activemq:queue:q_specimen_res" />
             <to uri="bean:specimenResponseBean" />
             <log message="标本信息已经上传到LIS，${body}"/>
             <to uri="sql:{{sql.markSpecPlaced}}" />
@@ -190,7 +154,7 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
        
         <!-- 查询报告单，组装报文 -->
         <route id="queryReport1-route">
-            <from uri="sql:{{sql.selectQueryReport}}"/>
+            <from uri="sql:{{sql.selectQueryReport}}?consumer.useFixedDelay=true&amp;consumer.delay=20000"/>
             <to uri="bean:reportBean?method=convertReport"/>
             <to uri="sql:{{sql.insertLog}}"/>
             <log message="已经转换查询报告单的报文信息 ${body[doc_id]}"/>
@@ -201,32 +165,32 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
             <setBody>
                 <simple>${body[msg]}</simple>
             </setBody>
-            <to uri="activemq:queue:q_qr_req" />
+            <to uri="activemq:queue:q_report_req" />
             <log message="查询报告单报文已经到MQ ${body}"/>
         </route>
         <!-- 查询报告单，从LIS写入到消息队列 -->
         <route id="queryReport3-route">
-            <from uri="activemq:queue:q_qr_req" />
+            <from uri="activemq:queue:q_report_req" />
             <to uri="bean:reportBean" />
-            <to uri="activemq:queue:q_qr_res" />
+            <to uri="activemq:queue:q_report_res" />
         </route>
         <!-- 查询报告单，将返回信息从消息队列写入到域医通数据库中 -->
         <route id="queryReport4-route">
-            <from uri="activemq:queue:q_qr_res" />
+            <from uri="activemq:queue:q_report_res"/>
             <to uri="bean:reportResponseBean" />
             <log message="报告单已经上传到LIS，${body[doc_id]}"/>
+            <to uri="sql:{{sql.insertLog}}"/>
+            <log message="将报告单内容插入日志"/>
             <choice>
                 <when>
                     <simple>${body[lis_status]} == '0' </simple>
-                    <log message="已发报告单"/>
-                    <to uri="sql:{{sql.insertLog}}"/>
-                    <log message="将报告单内容插入日志"/>
-                    <to uri="sql:{{sql.markSpecReported}}"/>
                     <log message="报告单已签发"/>
+                    <to uri="sql:{{sql.markSpecReported}}"/>
                 </when>
                 <when>
-                    <simple>${body[IsReimbu]} == '0'</simple>
+                    <simple>${body[lis_status]} == '#211 检验报告未出！'</simple>
                     <log message="未出报告单"/>
+                    <to uri = "sql: {{sql.markSpecReportTesting}}"/>
                     <to uri = "sql: {{sql.markSpecReportTesting}}"/>
                 </when>
                 <when>
