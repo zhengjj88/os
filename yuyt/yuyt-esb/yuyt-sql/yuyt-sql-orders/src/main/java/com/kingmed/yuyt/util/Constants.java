@@ -52,5 +52,29 @@ public class Constants {
     public static final String POSITIVE_X="X";//未知阳性、阴性
     
     public static final String DOC_ID="doc_id";
+    
+    public static final String LIS_XML_DECLARATION ="<?xml version=\"1.0\" encoding=\"gb2312\"?>";
+    
+    public static final String EXP_SPEC_DOC_ID="/response/spec_doc_id";//正在表达式，标本的文档ID
+    
+    public static final String EXP_DOC_ID="/response/doc_id";//正在表达式，文档ID
+    
+    public static final String EXP_SUB_COMPANY="/response/sub_company";//正则表达式，子公司代码
+    
+    public static final String EXP_HOSPITAL="/response/hospital";//正则表达式，医院代码
+    
+    public static final String EXP_KM_BARCODE="/response/km_barcode";//正则表达式，金域母码
+    
+    public static final String EXP_IS_ISREIMBU="/response/IsReimbu";//是否退单的正则表达式
+    
+    public static final String EXP_REPORT_STATUS="/response/report_status";//报告单的状态的正则表达式
+    
+    public static final String EXP_REPORT_DETAIL_STATUS="/response/report_detail_status";//报告单信息的状态的正则表达式
+    
+    public static final String EXP_REPORT_FILE="/response/report/Data/Data_Row/Report";//报告单的正则表达式
+    
+    public static final String EXP_REPORT_DETAIL="/response/reportDetail";//报告单详情的正则表达式
+    
+    
         
 }

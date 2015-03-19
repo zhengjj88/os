@@ -28,7 +28,6 @@ public class ReportResponseBean implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(ReportResponseBean.class);
     private List<String> hpvHighRish17 =null;
-
     public List<String> getHpvHighRish17() {
         return hpvHighRish17;
     }
@@ -41,71 +40,80 @@ public class ReportResponseBean implements Processor {
     public void process(Exchange msg) throws Exception {
         String record = msg.getIn().getBody(String.class);
 
-        Map<String, Object> map = XMLHandler.transXmltoMapForReport(record);
-        String lis_status=(String)map.get("lis_status");
-        String lis_status1=(String)map.get("lis_status1");
-        String IsReimbu=(String)map.get("IsReimbu");
+        Document doc = DocumentHelper.parseText(record);
+        Map<String, Object> map = new HashMap<String,Object>();
+        String report_status = doc.selectSingleNode(Constants.EXP_REPORT_STATUS).getText();
+        String report_detail_status=doc.selectSingleNode(Constants.EXP_REPORT_DETAIL_STATUS).getText();
+        String isReimbu =doc.selectSingleNode(Constants.EXP_IS_ISREIMBU).getText();
+        String reportFile = "";
+        String isPositive = "";
+        String docId=doc.selectSingleNode(Constants.EXP_DOC_ID).getText();
+        String subCompany=doc.selectSingleNode(Constants.EXP_SUB_COMPANY).getText();
+        String hospitial=doc.selectSingleNode(Constants.EXP_HOSPITAL).getText();
+        String kmBarcode=doc.selectSingleNode(Constants.EXP_KM_BARCODE).getText();
+        String spec_doc_id = doc.selectSingleNode(Constants.EXP_SPEC_DOC_ID).getText();
+        
         map.put("enable", Constants.ENABLE_YES);
         map.put("msg_type", Constants.MSG_TYPE_QUERY_REPORT_RESPONSE);
+        map.put("doc_id", docId);//报告单 id
+        map.put("spec_doc_id", spec_doc_id);//标本 id
+        map.put("sub_company",subCompany);
+        map.put("hospital",hospitial);
+        map.put("km_barcode",kmBarcode);
         map.put("direction", Constants.MSG_IN);
-        map.put("msg", map.get("Data"));//<Data></Data>
+        map.put("msg", record);
         map.put("create_time", new Timestamp(System.currentTimeMillis()));
         map.put("status", Constants.MSG_STATUS_NEW);//创建成功
-
-        //检测
-        
-        if(Constants.LIS_S.equals(lis_status)){//成功查询到报告单
-            checkPositive(map);
-            String data = (String) map.get("Data");
-            Map<String, String> m = XMLHandler.transSimpleXmltoMap(data);
-            String Report = m.get("Report");
-            map.put("reportfile", Report);
+        map.put("report_status", report_status);
+        map.put("report_detail_status", report_detail_status);
+        map.put("IsReimbu", isReimbu);
+        if(report_status.equals(Constants.LIS_S)){
+            reportFile = doc.selectSingleNode(Constants.EXP_REPORT_FILE).getText();
+            isPositive = this.checkPositive(doc);//检测是否阳性
         }
+        map.put("reportfile", reportFile);
+        map.put(Constants.POSITIVE, isPositive);
+        
         msg.getOut().setBody(map);
 
     }
 
     /**
      * 增加阳性标示
-     * @param map
+     * @param map LIS返回的报告单详情，参考LIS双向对接服务器的接口文档 queryRequestDetail
      * @throws DocumentException 
      */
-    public void checkPositive(Map<String, Object> map) throws DocumentException {
-        String xml = (String)map.get("msg");
-        String expDataRow ="/Data/Data_Row" ;
-        String expNaturalItem = "/Data/Data_Row[1]/NaturalItemName";//自然项目代码表达式
+    public String checkPositive(Document doc) throws DocumentException {
+        String re =Constants.POSITIVE_X;
+        String expDataRow =     "/response/report_detail/Data/Data_Row" ;
+        String expNaturalItem = "/response/report_detail/Data/Data_Row[1]/NaturalItemName";//自然项目代码表达式
 
-        String cp = "/Data/Data_Row[NaturalItem=5105]";//细胞病理项目代码
-        String cp1 = "/Data/Data_Row[NaturalItem=5903]";//
-        String expResult = "/Data/Data_Row/Result";
+        String cp =         "/response/report_detail/Data/Data_Row[NaturalItem=5105]";//细胞病理项目代码
+        String cp1 =        "/response/report_detail/Data/Data_Row[NaturalItem=5903]";//
+        String expResult =  "/response/report_detail/Data/Data_Row/Result";
         String result = null;
-        Document doc = DocumentHelper.parseText(xml);
         Node node = doc.selectSingleNode(expNaturalItem);
         String naturalItemName = node.getText();
         String singleItemName =null;
         List<Element> cpElms = doc.selectNodes(cp);
-        map.put(Constants.POSITIVE, Constants.POSITIVE_X);
-        if (cpElms != null && cpElms.size() > 0) {            
-            String positive = checkPositive4CP(doc, expResult);
-            map.put(Constants.POSITIVE, positive);
-            return;
+        if (cpElms != null && cpElms.size() > 0) {        
+            re = checkPositive4CP(doc, expResult);
+            return re;
         }
-        
         cpElms = doc.selectNodes(cp1);
         if (cpElms != null && cpElms.size() > 0) {            
-            String positive = checkPositive4CP(doc, expResult);
-            map.put(Constants.POSITIVE, positive);
-            return;
+            re = checkPositive4CP(doc, expResult);
+            return re;
         }
 
         if (naturalItemName.contains("高危型HPV")) {//高危型HPV
             result = doc.selectSingleNode(expResult).getText();
             if (result.contains("阳")) {
-                map.put(Constants.POSITIVE, Constants.POSITIVE_Y);
+                re = Constants.POSITIVE_Y;
             } else {
-                map.put(Constants.POSITIVE, Constants.POSITIVE_N);
+                re = Constants.POSITIVE_N;
             }
-            return;
+            return re;
         }
         
         if (naturalItemName.contains("HPV分型检测")) {//高危型HPV
@@ -114,13 +122,12 @@ public class ReportResponseBean implements Processor {
                 singleItemName = e.element("SingleItemName").getName();
                 result = e.element("Result").getText();
                 if(this.hpvHighRish17.contains(singleItemName)&&result.contains("阳")){
-                    map.put(Constants.POSITIVE, Constants.POSITIVE_Y);
-                    break;
+                    re = Constants.POSITIVE_Y;
+                    return re;
                 }
             }
-            map.put(Constants.POSITIVE, Constants.POSITIVE_N);
-            return;
         }
+        return re;
     }
 
     private String checkPositive4CP(Document doc, String expResult) {//细胞病理检测项目
@@ -139,5 +146,4 @@ public class ReportResponseBean implements Processor {
             return Constants.POSITIVE_N;
         }
     }
-
 }

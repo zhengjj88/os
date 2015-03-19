@@ -82,9 +82,10 @@ public class LISClient {
     }
 
     /**
+     * 上传标本信息到LIS
      *
-     * @param hospCode
-     * @param requestInfo
+     * @param hospCode 医院代码
+     * @param specimen 标本信息，参考LIS的Webservice接口文档的报文格式
      * @return e，异常退出；0：成功上传；201：无效的SID
      */
     public String sendRequestInfo(String hospCode, String specimen) {
@@ -143,9 +144,23 @@ public class LISClient {
         return r;
     }
 
+    /**
+     * 报告单查询，封装了结果查询(包含了退单，诊断意见) ，参考文档 金域LIS数据接口方案.doc，5.1.4.	报告单查询，5.1.3.	结果查询
+     *
+     * @param hospCode 医院代码
+     * @param kmbarcode 金域条码的母码
+     * @return
+     * @throws Exception
+     */
     public String sendRequest4QueryReport(String hospCode, String kmbarcode) throws Exception {
         logger.info("查询报告单");
-        String re = null;
+        String report_status = "";
+        String report_detail_status = "";
+        String report = "";
+        String reportDetail = "";
+        String isReimbu = "";
+
+        StringBuilder re = new StringBuilder();
         String sid = SIDCache.getInstance().get(companyCode, hospCode);
         Hospital hospital = hospitalCache.get(this.companyCode, hospCode);
         if (sid == null) {
@@ -170,34 +185,37 @@ public class LISClient {
         }
 
         rv = _return.value;
-        if (Constants.LIS_S.equals(rv)) {               //已经查询到报告单
-            StringBuilder sb = new StringBuilder();
-            sb.append("<lis_status>").append(rv).append("</lis_status>")
-              .append(resultInfo.value);
-            re = sb.toString();
-        } else if (rv.contains(Constants.LIS_EMPTY)) {    //表示查询结果为空，报告单不存在或者实验室退单
-            StringBuilder sb = new StringBuilder();
-            sb.append("<lis_status>").append(rv).append("</lis_status>");
-            
+
+        report_status = _return.value;
+        report = resultInfo.value;
+
+        if (Constants.LIS_S.equals(report_status)) {               //已经查询到报告单,继续查询报告单详情
+            iLis.queryRequestDetail(sid, kmbarcode, resultInfo, _return);
+            report_detail_status = _return.value;
+            reportDetail = resultInfo.value.replace(Constants.LIS_XML_DECLARATION, "");
+        } else if (report_status.contains(Constants.LIS_EMPTY)) {    //表示查询结果为空，报告单不存在或者实验室退单
             iLis.queryRequestDetail(sid, kmbarcode, resultInfo, _return);//检测是否退单
-            rv = _return.value;
-            sb.append("<lis_status1>").append(rv).append("</lis_status1>");
-            if (Constants.LIS_S.equals(rv)) {  //实验室已退单
-                List<Node> nodes = XMLHandler.query(resultInfo.value, "/Data/Data_Row[IsReimbu=1]");
-                if(nodes != null && nodes.size()>0){
-                    sb.append("<IsReimbu>").append(Constants.LIS_ISREIMBU_Y).append("</IsReimbu>");
-                }else{
-                    sb.append("<IsReimbu>").append(Constants.LIS_ISREIMBU_N).append("</IsReimbu>");
+            report_detail_status = _return.value;
+            reportDetail = resultInfo.value.replace(Constants.LIS_XML_DECLARATION, "");//删除报告单详情的xml声明
+            if (Constants.LIS_S.equals(report_detail_status)) {  //实验室已退单
+                List<Node> nodes = XMLHandler.query(resultInfo.value, Constants.EXP_IS_ISREIMBU);
+                if (nodes != null && nodes.size() > 0) {
+                    isReimbu = Constants.LIS_ISREIMBU_Y;
+                } else {
+                    isReimbu = Constants.LIS_ISREIMBU_N;
                 }
             }
-            re = sb.toString();
-        }else {                                         //未知返回代码
-            StringBuilder sb = new StringBuilder();
-            sb.append("<lis_status>").append(rv).append("</lis_status>")
-              .append(resultInfo.value);
-            re = sb.toString();
+        } else {
+            //未知返回代码
+            logger.warn("未处理的返回值=" + report_status);
         }
-        return re;
+        re.append("<report_status>").append(report_status).append("</report_status>")
+          .append("<report_detail_status>").append(report_detail_status).append("</report_detail_status>")
+          .append("<IsReimbu>").append(isReimbu).append("</IsReimbu>")
+          .append("<report>").append(report).append("</report>")
+          .append("<report_detail>").append(reportDetail).append("</report_detail>");
+
+        return re.toString();
     }
 
     public String login(Hospital hospital) {

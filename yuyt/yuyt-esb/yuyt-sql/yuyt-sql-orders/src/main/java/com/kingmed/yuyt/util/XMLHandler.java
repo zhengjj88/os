@@ -43,6 +43,7 @@ public class XMLHandler {
             Element dataElement = (Element) iter.next();
             map.put(dataElement.getName(), dataElement.getText());
         }
+        /*
         Element e = (Element) (rootElt.element("Data"));
         String data = "";
         if (e != null) {
@@ -52,6 +53,7 @@ public class XMLHandler {
             data = xmlInfo;
             map.put("Data", data);
         }
+        */
         return map;
     }
 
