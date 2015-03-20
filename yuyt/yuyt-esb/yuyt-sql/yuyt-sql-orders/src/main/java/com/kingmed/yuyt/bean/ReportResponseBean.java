@@ -4,8 +4,8 @@
 package com.kingmed.yuyt.bean;
 
 import com.kingmed.yuyt.util.Constants;
-import com.kingmed.yuyt.util.XMLHandler;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 public class ReportResponseBean implements Processor {
 
     private static final Logger logger = LoggerFactory.getLogger(ReportResponseBean.class);
-    private List<String> hpvHighRish17 =null;
+    private List<String> hpvHighRish17 = new ArrayList<String>();
     public List<String> getHpvHighRish17() {
         return hpvHighRish17;
     }
@@ -44,9 +44,9 @@ public class ReportResponseBean implements Processor {
         Map<String, Object> map = new HashMap<String,Object>();
         String report_status = doc.selectSingleNode(Constants.EXP_REPORT_STATUS).getText();
         String report_detail_status=doc.selectSingleNode(Constants.EXP_REPORT_DETAIL_STATUS).getText();
-        String isReimbu =doc.selectSingleNode(Constants.EXP_IS_ISREIMBU).getText();
+        String isReimbu =doc.selectSingleNode(Constants.EXP_RESPONSE_IS_ISREIMBU).getText();
         String reportFile = "";
-        String isPositive = "";
+        String isPositive = Constants.POSITIVE_X;
         String docId=doc.selectSingleNode(Constants.EXP_DOC_ID).getText();
         String subCompany=doc.selectSingleNode(Constants.EXP_SUB_COMPANY).getText();
         String hospitial=doc.selectSingleNode(Constants.EXP_HOSPITAL).getText();
@@ -89,7 +89,7 @@ public class ReportResponseBean implements Processor {
         String expNaturalItem = "/response/report_detail/Data/Data_Row[1]/NaturalItemName";//自然项目代码表达式
 
         String cp =         "/response/report_detail/Data/Data_Row[NaturalItem=5105]";//细胞病理项目代码
-        String cp1 =        "/response/report_detail/Data/Data_Row[NaturalItem=5903]";//
+        String cp1 =        "/response/report_detail/Data/Data_Row[NaturalItem=5903]";//细胞病理项目代码
         String expResult =  "/response/report_detail/Data/Data_Row/Result";
         String result = null;
         Node node = doc.selectSingleNode(expNaturalItem);
@@ -107,19 +107,19 @@ public class ReportResponseBean implements Processor {
         }
 
         if (naturalItemName.contains("高危型HPV")) {//高危型HPV
+            re = Constants.POSITIVE_N;
             result = doc.selectSingleNode(expResult).getText();
             if (result.contains("阳")) {
                 re = Constants.POSITIVE_Y;
-            } else {
-                re = Constants.POSITIVE_N;
-            }
+            } 
             return re;
         }
         
         if (naturalItemName.contains("HPV分型检测")) {//高危型HPV
+            re = Constants.POSITIVE_N;
             List<Element> es = doc.selectNodes(expDataRow);
             for(Element e: es){
-                singleItemName = e.element("SingleItemName").getName();
+                singleItemName = e.element("SingleItemName").getText();
                 result = e.element("Result").getText();
                 if(this.hpvHighRish17.contains(singleItemName)&&result.contains("阳")){
                     re = Constants.POSITIVE_Y;
@@ -143,7 +143,7 @@ public class ReportResponseBean implements Processor {
             
             return Constants.POSITIVE_Y;
         } else {
-            return Constants.POSITIVE_N;
+            return Constants.POSITIVE_X;
         }
     }
 }

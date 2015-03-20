@@ -65,7 +65,9 @@ public class Constants {
     
     public static final String EXP_KM_BARCODE="/response/km_barcode";//正则表达式，金域母码
     
-    public static final String EXP_IS_ISREIMBU="/response/IsReimbu";//是否退单的正则表达式
+    public static final String EXP_RESPONSE_IS_ISREIMBU="/response/IsReimbu";//是否退单的正则表达式
+    
+    public static final String EXP_IS_ISREIMBU="/Data/Data_Row/IsReimbu";//是否退单的正则表达式
     
     public static final String EXP_REPORT_STATUS="/response/report_status";//报告单的状态的正则表达式
     

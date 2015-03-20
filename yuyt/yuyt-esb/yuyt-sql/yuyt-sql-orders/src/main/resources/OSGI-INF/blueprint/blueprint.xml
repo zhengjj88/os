@@ -36,6 +36,7 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
         <property name="lisClients">
             <map>
                 <entry key="${gz_lis_code}" value-ref="gzLISClient"/>
+                <entry key="${sy_lis_code}" value-ref="syLISClient"/>
             </map>
         </property>
     </bean>
@@ -44,29 +45,30 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
         <property name="lisClients">
             <map>
                 <entry key="${gz_lis_code}" value-ref="gzLISClient"/>
+                <entry key="${sy_lis_code}" value-ref="syLISClient"/>
             </map>
         </property>
     </bean>
     <bean id="reportResponseBean" class="com.kingmed.yuyt.bean.ReportResponseBean">
         <property name="hpvHighRish17">
             <list>
-                <value>${hpv-16}</value>
-                <value>${hpv-18}</value>
-                <value>${hpv-26}</value>
-                <value>${hpv-31}</value>
-                <value>${hpv-33}</value>
-                <value>${hpv-35}</value>
-                <value>${hpv-39}</value>
-                <value>${hpv-45}</value>
-                <value>${hpv-51}</value>
-                <value>${hpv-52}</value>
-                <value>${hpv-53}</value>
-                <value>${hpv-56}</value>
-                <value>${hpv-58}</value>
-                <value>${hpv-59}</value>
-                <value>${hpv-66}</value>
-                <value>${hpv-68}</value>
-                <value>${hpv-82}</value>
+                <value>人乳头瘤病毒16型</value>
+                <value>人乳头瘤病毒18型</value>
+                <value>人乳头瘤病毒26型</value>
+                <value>人乳头瘤病毒31型</value>
+                <value>人乳头瘤病毒33型</value>
+                <value>人乳头瘤病毒35型</value>
+                <value>人乳头瘤病毒39型</value>
+                <value>人乳头瘤病毒45型</value>
+                <value>人乳头瘤病毒51型</value>
+                <value>人乳头瘤病毒52型</value>
+                <value>人乳头瘤病毒53型</value>
+                <value>人乳头瘤病毒56型</value>
+                <value>人乳头瘤病毒58型</value>
+                <value>人乳头瘤病毒59型</value>
+                <value>人乳头瘤病毒66型</value>
+                <value>人乳头瘤病毒68型</value>
+                <value>人乳头瘤病毒82型</value>
             </list>
         </property>
     </bean>
@@ -109,6 +111,12 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
         <property name="companyCode" value="${gz_lis_code}"/>
         <property name="companyName" value="广州金域医学检验中心"/>
         <property name="ilisPortAddress" value="${gz_lis_address}"/>
+        <property name="hospitalCache" ref="hospitalCache"/>
+    </bean>
+    <bean id="syLISClient" class="com.kingmed.lis.ws.client.LISClient" init-method="init">
+        <property name="companyCode" value="${sy_lis_code}"/>
+        <property name="companyName" value="沈阳金域"/>
+        <property name="ilisPortAddress" value="${sy_lis_address}"/>
         <property name="hospitalCache" ref="hospitalCache"/>
     </bean>
     
@@ -183,24 +191,29 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
             <log message="将报告单内容插入日志"/>
             <choice>
                 <when>
-                    <simple>${body[lis_status]} == '0' </simple>
-                    <log message="报告单已签发"/>
+                    <simple>${body[report_status]} == '0' </simple>
+                    <log message="报告单已签发，更新报告单表"/>
                     <to uri="sql:{{sql.markSpecReported}}"/>
-                </when>
-                <when>
-                    <simple>${body[lis_status]} == '#211 检验报告未出！'</simple>
-                    <log message="未出报告单"/>
-                    <to uri = "sql: {{sql.markSpecReportTesting}}"/>
-                    <to uri = "sql: {{sql.markSpecReportTesting}}"/>
+                    <log message="报告单已签发，更新标本表 report doc id ${body[doc_id]}, spec doc id ${body[spec_doc_id]}"/>
+                    <to uri="sql:{{sql.markReported}}"/>
                 </when>
                 <when>
                     <simple>${body[IsReimbu]} == '1'</simple>
                     <log message="实验室退单"/>
                     <to uri = "sql: {{sql.markSpecReportReimbu}}"/>
+                    <to uri = "sql: {{sql.marSpecReimbu}}"/>
+                </when>
+                <when>
+                    <simple>${body[report_status]} == '#211 检验报告未出！'</simple>
+                    <log message="未出报告单"/>
+                    <to uri = "sql: {{sql.markSpecReportTesting}}"/>
+                    <log message="还原查询报告单的请求"/>
+                    <to uri = "sql: {{sql.markMsgNew}}"/>
+                    <log message="删除报告单的响应"/>
+                    <to uri = "sql: {{sql.deleteMsg}}"/>
                 </when>
             </choice>
         </route>
-        
         <!-- 发送阳性召回SMS -->
         <route id="sendSMS1-route">
             <from uri="sql:{{sql.selectSMS}}"/>
