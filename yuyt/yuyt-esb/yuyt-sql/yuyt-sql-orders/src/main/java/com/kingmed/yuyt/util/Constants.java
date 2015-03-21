@@ -31,7 +31,12 @@ public class Constants {
     
     public static final String LIS_EMPTY="211";//报告单未出
     
+    public static final String LIS_BARCODE_NOT_FOUND="216";//标本条码不存在，如 #216 条码test15031702不存在！
+    
+    public static final String LIS_SPEC_LG_ACCPTED="A"; //标本状态，外勤已收取并且未到实验室
+    
     public static final String LIS_ISREIMBU_Y="1";//LIS退单
+    
     public static final String LIS_ISREIMBU_N="0";//LIS未退单
     
     public static final String F_EXCEPTION="E";//异常退出
@@ -66,6 +71,8 @@ public class Constants {
     public static final String EXP_KM_BARCODE="/response/km_barcode";//正则表达式，金域母码
     
     public static final String EXP_RESPONSE_IS_ISREIMBU="/response/IsReimbu";//是否退单的正则表达式
+    
+    public static final String EXP_RESPONSE_SPE_STATUS="/response/speStatus";//标本状态
     
     public static final String EXP_IS_ISREIMBU="/Data/Data_Row/IsReimbu";//是否退单的正则表达式
     

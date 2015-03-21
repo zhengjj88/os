@@ -90,7 +90,7 @@ public class LISClient {
      */
     public String sendRequestInfo(String hospCode, String specimen) {
         logger.info("上传标本信息到LIS");
-        String r = null;
+        String r = "";
         String sid = SIDCache.getInstance().get(companyCode, hospCode);
         Hospital hospital = hospitalCache.get(this.companyCode, hospCode);
         if (sid == null) {
@@ -159,6 +159,7 @@ public class LISClient {
         String report = "";
         String reportDetail = "";
         String isReimbu = "";
+        String speStatus="";
 
         StringBuilder re = new StringBuilder();
         String sid = SIDCache.getInstance().get(companyCode, hospCode);
@@ -204,6 +205,8 @@ public class LISClient {
                 } else {
                     isReimbu = Constants.LIS_ISREIMBU_N;
                 }
+            }else if(report_detail_status.contains(Constants.LIS_BARCODE_NOT_FOUND)){//外勤已收取标本，并且标本在路上未到实验室
+                speStatus=Constants.LIS_SPEC_LG_ACCPTED;
             }
         } else {
             //未知返回代码
@@ -212,6 +215,7 @@ public class LISClient {
         re.append("<report_status>").append(report_status).append("</report_status>")
           .append("<report_detail_status>").append(report_detail_status).append("</report_detail_status>")
           .append("<IsReimbu>").append(isReimbu).append("</IsReimbu>")
+          .append("<speStatus>").append(speStatus).append("</speStatus>")
           .append("<report>").append(report).append("</report>")
           .append("<report_detail>").append(reportDetail).append("</report_detail>");
 

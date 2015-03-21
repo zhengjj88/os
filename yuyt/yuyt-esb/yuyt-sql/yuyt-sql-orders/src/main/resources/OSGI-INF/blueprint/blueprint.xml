@@ -125,10 +125,10 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
         <propertyPlaceholder id="placeholder" location="classpath:sql.properties"/>
         <!-- 转换标本信息 -->
         <route id="uploadSpec1-route">
-            <from uri="sql:{{sql.selectSpecRcved}}?consumer.onConsume={{sql.markSpec}}"/>
+            <from uri="sql:{{sql.selectSpecRcved}}?consumer.useFixedDelay=true&amp;consumer.delay=20000"/>
             <to uri="bean:specimenBean?method=convertSpecimen"/>
             <to uri="sql:{{sql.insertLog}}"/>
-            <log message="已经转换标本信息 ${body[doc_id]}"/>
+            <log message="上传标本信息，已到log ${body[doc_id]}"/>
         </route>
         <!-- 上传标本信息 写入到消息队列 -->
         <route id="uploadSpec2-route">
@@ -137,7 +137,7 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
                 <simple>${body[msg]}</simple>
             </setBody>
             <to uri="activemq:queue:q_specimen_req" />
-            <log message="已经上传标本信息到MQ ${body}"/>
+            <log message="上传标本信息，已到MQ请求队列 ${body}"/>
         </route>
         
         <!-- 上传标本信息，从消息队列写入到LIS中 -->
@@ -145,71 +145,84 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
             <from uri="activemq:queue:q_specimen_req" />
             <to uri="bean:specimenBean" />
             <to uri="activemq:queue:q_specimen_res" />
+            <log message="上传标本信息，已到MQ返回队列，${body}"/>
         </route>
         
         <!-- 上传标本信息，将返回信息从消息队列写入到域医通数据库中 -->
         <route id="uploadSpec4-route">
             <from uri="activemq:queue:q_specimen_res" />
             <to uri="bean:specimenResponseBean" />
-            <log message="标本信息已经上传到LIS，${body}"/>
-            <to uri="sql:{{sql.markSpecPlaced}}" />
-            <log message="已经更新消息的状态，已经上传消息到LIS,${body}"/>
-            <to uri="sql:{{sql.markSpecTesting}}" />
-            <log message="已经更新标本的状态，检测中,${body}"/>
-            <to uri="sql:{{sql.markSpecReporting}}" />
-            <log message="已经更新报告单，可查询报告单,${body}"/>
+            <choice>
+                <when>
+                    <simple>${body[status]} == '0' </simple>
+                    <to uri="sql:{{sql.markSpecPlaced}}" />
+                    <to uri="sql:{{sql.markSpecAccepted}}" />
+                    <to uri="sql:{{sql.markSpecReporting}}" />
+                    <log message="上传标本信息，标本信息已经上传到LIS，${body}"/>
+                </when>
+                <when>
+                    <simple>${body[status]} != '0' </simple>
+                    <log message="上传标本信息,失败, 还原LOG状态 ${body}"/>
+                    <to uri = "sql: {{sql.markSpecNew}}"/>
+                </when>
+            </choice>
         </route>
        
         <!-- 查询报告单，组装报文 -->
         <route id="queryReport1-route">
-            <from uri="sql:{{sql.selectQueryReport}}?consumer.useFixedDelay=true&amp;consumer.delay=20000"/>
+            <from uri="sql:{{sql.selectQueryReport}}?consumer.useFixedDelay=true&amp;consumer.delay=30000"/>
             <to uri="bean:reportBean?method=convertReport"/>
             <to uri="sql:{{sql.insertLog}}"/>
-            <log message="已经转换查询报告单的报文信息 ${body[doc_id]}"/>
+            <log message="查询报告单，请求，已到log ${body[doc_id]}"/>
         </route>
         <!-- 查询报告单，从域医通数据库写入到消息队列 -->
         <route id="queryReport2-route">
-            <from uri="sql:{{sql.selectMsgQR}}?consumer.onConsume={{sql.markMsgQROut}}"/>
+            <from uri="sql:{{sql.selectMsgQR}}?consumer.onConsume={{sql.markMsgQROut}}&amp;consumer.delay=40000"/>
             <setBody>
                 <simple>${body[msg]}</simple>
             </setBody>
             <to uri="activemq:queue:q_report_req" />
-            <log message="查询报告单报文已经到MQ ${body}"/>
+            <log message="查询报告单，请求, 已到MQ ${body}"/>
         </route>
         <!-- 查询报告单，从LIS写入到消息队列 -->
         <route id="queryReport3-route">
             <from uri="activemq:queue:q_report_req" />
             <to uri="bean:reportBean" />
             <to uri="activemq:queue:q_report_res" />
+            <log message="查询报告单，响应, 已到MQ ${body}"/>
         </route>
         <!-- 查询报告单，将返回信息从消息队列写入到域医通数据库中 -->
         <route id="queryReport4-route">
             <from uri="activemq:queue:q_report_res"/>
             <to uri="bean:reportResponseBean" />
-            <log message="报告单已经上传到LIS，${body[doc_id]}"/>
             <to uri="sql:{{sql.insertLog}}"/>
-            <log message="将报告单内容插入日志"/>
+            <log message="查询报告单，响应，已到LIS，将报告单内容插入日志，${body[doc_id]}"/>
             <choice>
                 <when>
                     <simple>${body[report_status]} == '0' </simple>
-                    <log message="报告单已签发，更新报告单表"/>
+                    <log message="查询报告单，响应，报告单已签发，更新标本表 report doc id ${body[doc_id]}, spec doc id ${body[spec_doc_id]}"/>
+                    <to uri="sql:{{sql.markSpecReported4Log}}"/>
                     <to uri="sql:{{sql.markSpecReported}}"/>
-                    <log message="报告单已签发，更新标本表 report doc id ${body[doc_id]}, spec doc id ${body[spec_doc_id]}"/>
                     <to uri="sql:{{sql.markReported}}"/>
                 </when>
                 <when>
                     <simple>${body[IsReimbu]} == '1'</simple>
-                    <log message="实验室退单"/>
+                    <log message="查询报告单，响应，实验室退单"/>
+                    <to uri = "sql:{{sql.markSpecReported4Log}}"/>
                     <to uri = "sql: {{sql.markSpecReportReimbu}}"/>
                     <to uri = "sql: {{sql.marSpecReimbu}}"/>
                 </when>
                 <when>
-                    <simple>${body[report_status]} == '#211 检验报告未出！'</simple>
-                    <log message="未出报告单"/>
-                    <to uri = "sql: {{sql.markSpecReportTesting}}"/>
-                    <log message="还原查询报告单的请求"/>
+                    <simple>${body[speStatus]} == 'A'</simple>
+                    <log message="查询报告单，响应，已接收"/>
                     <to uri = "sql: {{sql.markMsgNew}}"/>
-                    <log message="删除报告单的响应"/>
+                    <to uri = "sql: {{sql.deleteMsg}}"/>
+                </when>
+                <when>
+                    <simple>${body[report_status]} == '#211 检验报告未出！'</simple>
+                    <log message="查询报告单，响应，检测中"/>
+                    <to uri = "sql: {{sql.markSpecReportTesting}}"/>
+                    <to uri = "sql: {{sql.markMsgNew}}"/>
                     <to uri = "sql: {{sql.deleteMsg}}"/>
                 </when>
             </choice>

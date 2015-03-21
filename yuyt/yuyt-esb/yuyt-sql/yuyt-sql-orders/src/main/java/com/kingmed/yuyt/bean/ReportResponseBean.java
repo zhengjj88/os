@@ -45,6 +45,7 @@ public class ReportResponseBean implements Processor {
         String report_status = doc.selectSingleNode(Constants.EXP_REPORT_STATUS).getText();
         String report_detail_status=doc.selectSingleNode(Constants.EXP_REPORT_DETAIL_STATUS).getText();
         String isReimbu =doc.selectSingleNode(Constants.EXP_RESPONSE_IS_ISREIMBU).getText();
+        String speStatus =doc.selectSingleNode(Constants.EXP_RESPONSE_SPE_STATUS).getText();
         String reportFile = "";
         String isPositive = Constants.POSITIVE_X;
         String docId=doc.selectSingleNode(Constants.EXP_DOC_ID).getText();
@@ -67,6 +68,8 @@ public class ReportResponseBean implements Processor {
         map.put("report_status", report_status);
         map.put("report_detail_status", report_detail_status);
         map.put("IsReimbu", isReimbu);
+        map.put("speStatus", speStatus);
+        
         if(report_status.equals(Constants.LIS_S)){
             reportFile = doc.selectSingleNode(Constants.EXP_REPORT_FILE).getText();
             isPositive = this.checkPositive(doc);//检测是否阳性

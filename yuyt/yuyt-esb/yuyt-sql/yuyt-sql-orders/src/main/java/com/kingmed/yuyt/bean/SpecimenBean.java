@@ -63,9 +63,9 @@ public class SpecimenBean implements Processor {
 
         LISClient lisClient = this.lisClients.get(companyCode);//根据子公司查询lis客户端
         String r = lisClient.sendRequestInfo(hospCode, specimen);
-        if(!r.equals(Constants.LIS_S)){
-            throw new Exception("上传标本信息失败");
-        }
+//        if(!r.equals(Constants.LIS_S)){
+//            throw new Exception("上传标本信息,失败");
+//        }
         StringBuilder res = new StringBuilder();
         res.append("<response>")
            .append("<src>").append(Constants.APP_LIS).append("</src>")
