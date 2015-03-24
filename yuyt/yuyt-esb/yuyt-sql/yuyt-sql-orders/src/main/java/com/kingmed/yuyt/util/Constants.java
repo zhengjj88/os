@@ -35,6 +35,8 @@ public class Constants {
     
     public static final String LIS_SPEC_LG_ACCPTED="A"; //标本状态，外勤已收取并且未到实验室
     
+    public static final String LIS_SPEC_PLACED="P"; //标本状态，外勤已收取并且未到实验室
+    
     public static final String LIS_ISREIMBU_Y="1";//LIS退单
     
     public static final String LIS_ISREIMBU_N="0";//LIS未退单

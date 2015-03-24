@@ -207,6 +207,8 @@ public class LISClient {
                 }
             }else if(report_detail_status.contains(Constants.LIS_BARCODE_NOT_FOUND)){//外勤已收取标本，并且标本在路上未到实验室
                 speStatus=Constants.LIS_SPEC_LG_ACCPTED;
+            }else {
+                speStatus = Constants.LIS_SPEC_PLACED;
             }
         } else {
             //未知返回代码
