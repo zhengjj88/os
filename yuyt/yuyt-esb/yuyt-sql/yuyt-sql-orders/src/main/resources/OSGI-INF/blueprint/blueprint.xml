@@ -222,6 +222,7 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
                     <simple>${body[report_status]} == '#211 检验报告未出！'</simple>
                     <log message="查询报告单，响应，检测中"/>
                     <to uri = "sql: {{sql.markSpecReportTesting}}"/>
+                    <to uri = "sql: {{sql.markSpecTesting}}"/>
                     <to uri = "sql: {{sql.markMsgNew}}"/>
                     <to uri = "sql: {{sql.deleteMsg}}"/>
                 </when>
