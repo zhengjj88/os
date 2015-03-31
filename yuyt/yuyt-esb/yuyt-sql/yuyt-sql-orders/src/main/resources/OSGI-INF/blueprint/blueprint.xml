@@ -26,6 +26,16 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
         <property name="brokerURL" value="${mq_url}"/>
     </bean>
+    <bean id = "hospitalCache" class="com.kingmed.yuyt.cache.HospitalCache"  init-method="init">
+        <property name="dataSource" ref="yuytDataSource"/>
+    </bean>
+    <bean id = "lisNodeCache" class="com.kingmed.yuyt.cache.LISNodeCache"  init-method="init">
+        <property name="dataSource" ref="yuytDataSource"/>
+    </bean>
+    <bean id = "lisClientCache" class="com.kingmed.yuyt.cache.LISClientCache"  init-method="init">
+        <property name="lisNodeCache" ref="lisNodeCache"/>
+        <property name="hospitalCache" ref="hospitalCache"/>
+    </bean>
     <bean id="panZhiBean" class="com.kingmed.yuyt.bean.PanzhiBean" init-method="init">
         <property name="orgId" value="${sms_orgid}"/>
         <property name="username" value="${sms_username}"/>
@@ -33,21 +43,11 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
         <property name="serverUrl" value="${sms_server_url}"/>
     </bean>
     <bean id="specimenBean" class="com.kingmed.yuyt.bean.SpecimenBean">
-        <property name="lisClients">
-            <map>
-                <entry key="${gz_lis_code}" value-ref="gzLISClient"/>
-                <entry key="${sy_lis_code}" value-ref="syLISClient"/>
-            </map>
-        </property>
+        <property name="lisClientCache" ref="lisClientCache"/>
     </bean>
     <bean id="specimenResponseBean" class="com.kingmed.yuyt.bean.SpecimenResponseBean"/>
     <bean id="reportBean" class="com.kingmed.yuyt.bean.ReportBean">
-        <property name="lisClients">
-            <map>
-                <entry key="${gz_lis_code}" value-ref="gzLISClient"/>
-                <entry key="${sy_lis_code}" value-ref="syLISClient"/>
-            </map>
-        </property>
+        <property name="lisClientCache" ref="lisClientCache"/>
     </bean>
     <bean id="reportResponseBean" class="com.kingmed.yuyt.bean.ReportResponseBean">
         <property name="hpvHighRish17">
@@ -76,49 +76,6 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
         <property name="panZhiBean" ref="panZhiBean"/>
     </bean>
     <bean id="smsResponseBean" class="com.kingmed.yuyt.bean.SMSResponseBean"/>
-    
-    <bean id="testGZ" class ="com.kingmed.yuyt.model.Hospital">
-        <property name="companyCode" value=""/>
-        <property name="code" value=""/>
-        <property name="name" value="广州金域测试医院"/>
-        <property name="lisUsername" value=""/>
-        <property name="lisPassword" value=""/>
-    </bean>
-    <bean id="gzha" class ="com.kingmed.yuyt.model.Hospital">
-        <property name="companyCode" value="01.1"/>
-        <property name="code" value="008363"/>
-        <property name="name" value="广州医院A"/>
-        <property name="lisUsername" value=""/>
-        <property name="lisPassword" value=""/>
-    </bean>
-    <bean id="syha" class ="com.kingmed.yuyt.model.Hospital">
-        <property name="companyCode" value="10.1"/>
-        <property name="code" value=""/>
-        <property name="name" value="沈阳医院A"/>
-        <property name="lisUsername" value=""/>
-        <property name="lisPassword" value=""/>
-    </bean>
-    <bean id = "hospitalCache" class="com.kingmed.yuyt.cache.HospitalCache">
-        <property name="cache">
-            <map>
-                <entry key="" value-ref="testGZ"/>
-                <entry key="" value-ref="gzha"/>
-                <entry key="" value-ref="syha"/>
-            </map>
-        </property>
-    </bean>
-    <bean id="gzLISClient" class="com.kingmed.lis.ws.client.LISClient" init-method="init">
-        <property name="companyCode" value="${gz_lis_code}"/>
-        <property name="companyName" value="广州金域医学检验中心"/>
-        <property name="ilisPortAddress" value="${gz_lis_address}"/>
-        <property name="hospitalCache" ref="hospitalCache"/>
-    </bean>
-    <bean id="syLISClient" class="com.kingmed.lis.ws.client.LISClient" init-method="init">
-        <property name="companyCode" value="${sy_lis_code}"/>
-        <property name="companyName" value="沈阳金域"/>
-        <property name="ilisPortAddress" value="${sy_lis_address}"/>
-        <property name="hospitalCache" ref="hospitalCache"/>
-    </bean>
     
     <camelContext xmlns="http://camel.apache.org/schema/blueprint">
         

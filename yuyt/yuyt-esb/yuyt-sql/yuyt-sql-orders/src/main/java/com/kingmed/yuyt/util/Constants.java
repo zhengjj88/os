@@ -86,6 +86,8 @@ public class Constants {
     
     public static final String EXP_REPORT_DETAIL="/response/reportDetail";//报告单详情的正则表达式
     
+    public static final String ENABLE_Y="Y";
     
+    public static final String ENABLE_N="N";
         
 }

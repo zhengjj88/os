@@ -1,14 +1,15 @@
 /**
- * Licensed to Kingmed
+ * Lincensed to Kingmed
  */
 package com.kingmed.yuyt.cache;
 
-import com.kingmed.yuyt.model.Hospital;
+import com.kingmed.yuyt.model.LISNode;
 import com.kingmed.yuyt.util.Constants;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -19,18 +20,18 @@ import org.slf4j.LoggerFactory;
  *
  * @author zhengjunjie
  */
-public class HospitalCache {
+public class LISNodeCache {
 
     private DataSource dataSource;
-    private Map<String, Hospital> hospitals;
-    private static final Logger logger = LoggerFactory.getLogger(HospitalCache.class);
+    private Map<String, LISNode> lisNodes;
+    private static final Logger logger = LoggerFactory.getLogger(LISNodeCache.class);
 
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
     public void init() {
-        hospitals = new HashMap<String, Hospital>();
+        lisNodes = new HashMap<String, LISNode>();
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -38,14 +39,11 @@ public class HospitalCache {
         String enable = null;
         String comCode = null;
         String comName = null;
-        String hosCode = null;
-        String hosName = null;
-        String username = null;
-        String password = null;
+        String address = null;
 
         try {
             con = this.dataSource.getConnection();
-            String sql = "select id, enable, com_code, com_name, hos_code, hos_name, username, password from t_hos_token where enable = ?";
+            String sql = "select id, enable, com_code, com_name, address from t_lis_service where enable = ?";
             ps = con.prepareCall(sql);
             ps.setString(1, Constants.ENABLE_Y);
             rs = ps.executeQuery();
@@ -54,51 +52,48 @@ public class HospitalCache {
                 enable = rs.getString(2);
                 comCode = rs.getString(3);
                 comName = rs.getString(4);
-                hosCode = rs.getString(5);
-                hosName = rs.getString(6);
-                username = rs.getString(7);
-                password = rs.getString(8);
-                Hospital hospital = new Hospital();
-
-                hospital.setId(id);
-                hospital.setEnable(enable);
-                hospital.setCompanyCode(comCode);
-                hospital.setComName(comName);
-                hospital.setCode(hosCode);
-                hospital.setName(hosName);
-                hospital.setLisUsername(username);
-                hospital.setLisPassword(password);
-                hospitals.put(hosCode, hospital);
+                address = rs.getString(5);
+                LISNode lisNode = new LISNode();
+                lisNode.setId(id);
+                lisNode.setEnable(enable);
+                lisNode.setComCode(comCode);
+                lisNode.setComName(comName);
+                lisNode.setAddress(address);
+                lisNodes.put(comCode, lisNode);
             }
         } catch (SQLException e) {
-            logger.error("≥ı ºªØhospitalª∫¥Ê ß∞‹", e);
+            logger.error("ÂàùÂßãÂåñLISNodeÁºìÂ≠òÂ§±Ë¥•", e);
         } finally {
             if (rs != null) {
                 try {
                     rs.close();
                 } catch (SQLException e) {
-                    logger.error("πÿ±’result ß∞‹", e);
+                    logger.error("ÂÖ≥Èó≠resultÂ§±Ë¥•", e);
                 }
             }
             if (ps != null) {
                 try {
                     ps.close();
                 } catch (SQLException e) {
-                    logger.error("πÿ±’ps ß∞‹", e);
+                    logger.error("ÂÖ≥Èó≠psÂ§±Ë¥•", e);
                 }
             }
             if (con != null) {
                 try {
                     con.close();
                 } catch (SQLException e) {
-                    logger.error("πÿ±’con ß∞‹", e);
+                    logger.error("ÂÖ≥Èó≠conÂ§±Ë¥•", e);
                 }
             }
         }
     }
 
-    public Hospital get(String hosCode) {
-        Hospital hospital = this.hospitals.get(hosCode);
-        return hospital;
+    public LISNode get(String comCode) {
+        LISNode lisNode = this.lisNodes.get(comCode);
+        return lisNode;
+    }
+
+    public Collection<LISNode> getAll() {
+        return this.lisNodes.values();
     }
 }

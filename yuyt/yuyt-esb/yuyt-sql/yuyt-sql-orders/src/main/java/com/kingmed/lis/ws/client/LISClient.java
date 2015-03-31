@@ -65,22 +65,6 @@ public class LISClient {
         iLis = new ILisProxy(this.ilisPortAddress);
     }
 
-    public Object login(Object body) {
-        logger.info(hospitalCache.get("01.1", "test").toString());
-        StringHolder SID = new StringHolder();
-        StringHolder _return = new StringHolder();
-
-        ILisProxy p = new ILisProxy("http://192.168.4.46:60080/GZWSTEST/Lis.dll/soap/ilis");
-        try {
-            p.login("01.10.0010", "01100010", "", false, SID, _return);
-        } catch (RemoteException ex) {
-            ex.printStackTrace();
-        }
-
-        logger.info(SID.value + "," + _return.value);
-        return SID.value + "," + _return.value;
-    }
-
     /**
      * 上传标本信息到LIS
      *
@@ -92,7 +76,7 @@ public class LISClient {
         logger.info("上传标本信息到LIS");
         String r = "";
         String sid = SIDCache.getInstance().get(companyCode, hospCode);
-        Hospital hospital = hospitalCache.get(this.companyCode, hospCode);
+        Hospital hospital = hospitalCache.get(hospCode);
         if (sid == null) {
             this.login(hospital);
             sid = SIDCache.getInstance().get(companyCode, hospCode);
@@ -163,7 +147,7 @@ public class LISClient {
 
         StringBuilder re = new StringBuilder();
         String sid = SIDCache.getInstance().get(companyCode, hospCode);
-        Hospital hospital = hospitalCache.get(this.companyCode, hospCode);
+        Hospital hospital = hospitalCache.get(hospCode);
         if (sid == null) {
             sid = this.login(hospital);
             this.validateSID(sid, hospCode);

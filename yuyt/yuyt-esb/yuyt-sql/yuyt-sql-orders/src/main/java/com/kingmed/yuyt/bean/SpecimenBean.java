@@ -5,6 +5,9 @@ package com.kingmed.yuyt.bean;
 
 import com.kingmed.yuyt.util.Constants;
 import com.kingmed.lis.ws.client.LISClient;
+import com.kingmed.yuyt.cache.HospitalCache;
+import com.kingmed.yuyt.cache.LISClientCache;
+import com.kingmed.yuyt.cache.LISNodeCache;
 import com.kingmed.yuyt.util.XMLHandler;
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
@@ -23,24 +26,20 @@ import org.slf4j.LoggerFactory;
  * @author zhengjunjie
  */
 public class SpecimenBean implements Processor {
-
+    private LISClientCache lisClientCache;
     private static final Logger log = LoggerFactory.getLogger(SpecimenBean.class);
     private static final SimpleDateFormat DF_CREATE_DATE = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");//LIS中要求的创建日期格式
 
-    private Map<String, LISClient> lisClients;
+    public SpecimenBean() { }
 
-    public SpecimenBean() {
-        log.info("构造函数");
+    public LISClientCache getLisClientCache() {
+        return lisClientCache;
     }
 
-    public void setLisClients(Map<String, LISClient> lisClients) {
-        this.lisClients = lisClients;
+    public void setLisClientCache(LISClientCache lisClientCache) {
+        this.lisClientCache = lisClientCache;
     }
-
-    public Map<String, LISClient> getLisClients() {
-        return lisClients;
-    }
-
+    
     @Override
     public void process(Exchange msg) throws Exception {
         log.trace("处理上传标本，消息 {}", msg);
@@ -51,21 +50,14 @@ public class SpecimenBean implements Processor {
         String companyCode = null;
         String hospCode = null;
 
-        String systemCode = paramMap.get("systemCode") != null ? paramMap.get("systemCode") : null;
+        //String systemCode = paramMap.get("systemCode") != null ? paramMap.get("systemCode") : null;
         String doc_id = paramMap.get("doc_id") != null ? paramMap.get("doc_id") : null;
         companyCode = paramMap.get("companyCode") != null ? paramMap.get("companyCode") : null;
         hospCode = paramMap.get("hospCode") != null ? paramMap.get("hospCode") : null;
         String specimen = paramMap.get("specimen") != null ? paramMap.get("specimen") : null;
-        //requestInfoXml = URLDecoder.decode(requestInfoXml,"UTF-8");
-        String domainUserId = paramMap.get("domainUserId") != null ? paramMap.get("domainUserId") : null;
-        String applicationId = paramMap.get("applicationId") != null ? paramMap.get("applicationId") : null;
-        String errorMsg = null;
 
-        LISClient lisClient = this.lisClients.get(companyCode);//根据子公司查询lis客户端
+        LISClient lisClient = this.lisClientCache.get(companyCode);//根据子公司查询lis客户端
         String r = lisClient.sendRequestInfo(hospCode, specimen);
-//        if(!r.equals(Constants.LIS_S)){
-//            throw new Exception("上传标本信息,失败");
-//        }
         StringBuilder res = new StringBuilder();
         res.append("<response>")
            .append("<src>").append(Constants.APP_LIS).append("</src>")
@@ -86,24 +78,15 @@ public class SpecimenBean implements Processor {
         String doc_id = (String) spec.get("doc_id");
         String userId = (String) spec.get("author");
         String applicationId = (String) spec.get("applicationid");
-        String checktype = (String) spec.get("item_p_checktype");
         String testprogram = (String) spec.get("item_p_programs");
         String kmbarcode = (String) spec.get("item_p_kmbarcode");
         String hospitalbarcode = (String) spec.get("item_p_hospitalbarcode");
-        String mobileno = (String) spec.get("item_p_mobileno");
         String name = (String) spec.get("item_p_name");
         String sex = (String) spec.get("item_p_sex");
-        String nation = (String) spec.get("item_p_nation");
         Timestamp borndate = (Timestamp) spec.get("item_p_borndate");
-        String idno = (String) spec.get("item_p_idno");
-        String address = (String) spec.get("item_p_address");
-        String collector = (String) spec.get("item_p_collector");
-        Timestamp collecttime = (Timestamp) spec.get("item_p_collectiontiime");
-        String registrar = (String) spec.get("item_p_registrar");
         Timestamp registrationtime = (Timestamp) spec.get("item_p_registrationtime");
         String companycode = (String) spec.get("item_p_companycode");
         String hospitalcode = (String) spec.get("item_p_hospitalcode");
-        String statu = (String) spec.get("item_p_status");
         String testStr = (String) spec.get("item_p_test_name");
         String hospitalname = (String) spec.get("item_p_hospitalname");
         if (kmbarcode.indexOf(Constants.KMBARCODE_SPLITTER) > 0) {
