@@ -8,9 +8,9 @@
 package com.kingmed.lis.ws;
 
 public interface ILisservice extends javax.xml.rpc.Service {
-    public java.lang.String getilisPortAddress();
+    public java.lang.String getILisPortAddress();
 
-    public com.kingmed.lis.ws.ILis getilisPort() throws javax.xml.rpc.ServiceException;
+    public com.kingmed.lis.ws.ILis getILisPort() throws javax.xml.rpc.ServiceException;
 
-    public com.kingmed.lis.ws.ILis getilisPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
+    public com.kingmed.lis.ws.ILis getILisPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
 }

@@ -143,7 +143,7 @@ public class LISClient {
         String report = "";
         String reportDetail = "";
         String isReimbu = "";
-        String speStatus="";
+        String speStatus = "";
 
         StringBuilder re = new StringBuilder();
         String sid = SIDCache.getInstance().get(companyCode, hospCode);
@@ -174,36 +174,60 @@ public class LISClient {
         report_status = _return.value;
         report = resultInfo.value;
 
-        if (Constants.LIS_S.equals(report_status)) {               //已经查询到报告单,继续查询报告单详情
+        if (Constants.LIS_S.equals(report_status)) { // 已经查询到报告单,继续查询报告单详情
             iLis.queryRequestDetail(sid, kmbarcode, resultInfo, _return);
             report_detail_status = _return.value;
             reportDetail = resultInfo.value.replace(Constants.LIS_XML_DECLARATION, "");
-        } else if (report_status.contains(Constants.LIS_EMPTY)) {    //表示查询结果为空，报告单不存在或者实验室退单
-            iLis.queryRequestDetail(sid, kmbarcode, resultInfo, _return);//检测是否退单
+            logger.info("NORMAL=" + kmbarcode);
+        } else if (report_status.contains(Constants.LIS_EMPTY)) { // 表示查询结果为空，报告单不存在或者实验室退单
+            iLis.queryRequestDetail(sid, kmbarcode, resultInfo, _return);// 检测是否退单
             report_detail_status = _return.value;
-            reportDetail = resultInfo.value.replace(Constants.LIS_XML_DECLARATION, "");//删除报告单详情的xml声明
-            if (Constants.LIS_S.equals(report_detail_status)) {  //实验室已退单
+            reportDetail = resultInfo.value.replace(Constants.LIS_XML_DECLARATION, "");// 删除报告单详情的xml声明
+            if (Constants.LIS_S.equals(report_detail_status)) { // 实验室已退单
                 List<Node> nodes = XMLHandler.query(resultInfo.value, Constants.EXP_IS_ISREIMBU);
                 if (nodes != null && nodes.size() > 0) {
                     isReimbu = Constants.LIS_ISREIMBU_Y;
+
+                    /**
+                     * 查询实验室退单报告单
+                     *
+                     * @author spike
+                     * @date 2015/03/29 BEGIN MODIFICATION
+                     */
+                    try {
+                        iLis.queryReimbuReport(sid, kmbarcode, resultInfo, _return);
+						// 此处不要抓取report_status否则导致业务逻辑出错
+                        // report_status = _return.value;
+                        report = resultInfo.value;
+                        report_detail_status = _return.value;
+                        reportDetail = resultInfo.value.replace(Constants.LIS_XML_DECLARATION, "");
+                        logger.info("REIMBU=" + kmbarcode);
+                    } catch (RemoteException e) {
+                        String msg = "查询实验室退单报告单失败" + ",地址" + ilisPortAddress + "报文=" + kmbarcode + ",";
+                        logger.error(msg, e);
+                        throw new Exception(msg);
+                    }
+                    /**
+                     * END MODIFICATION
+                     */
                 } else {
                     isReimbu = Constants.LIS_ISREIMBU_N;
                 }
-            }else if(report_detail_status.contains(Constants.LIS_BARCODE_NOT_FOUND)){//外勤已收取标本，并且标本在路上未到实验室
-                speStatus=Constants.LIS_SPEC_LG_ACCPTED;
-            }else {
+            } else if (report_detail_status.contains(Constants.LIS_BARCODE_NOT_FOUND)) {// 外勤已收取标本，并且标本在路上未到实验室
+                speStatus = Constants.LIS_SPEC_LG_ACCPTED;
+            } else {
                 speStatus = Constants.LIS_SPEC_PLACED;
             }
         } else {
-            //未知返回代码
+            // 未知返回代码
             logger.warn("未处理的返回值=" + report_status);
         }
         re.append("<report_status>").append(report_status).append("</report_status>")
-          .append("<report_detail_status>").append(report_detail_status).append("</report_detail_status>")
-          .append("<IsReimbu>").append(isReimbu).append("</IsReimbu>")
-          .append("<speStatus>").append(speStatus).append("</speStatus>")
-          .append("<report>").append(report).append("</report>")
-          .append("<report_detail>").append(reportDetail).append("</report_detail>");
+                .append("<report_detail_status>").append(report_detail_status).append("</report_detail_status>")
+                .append("<IsReimbu>").append(isReimbu).append("</IsReimbu>")
+                .append("<speStatus>").append(speStatus).append("</speStatus>")
+                .append("<report>").append(report).append("</report>")
+                .append("<report_detail>").append(reportDetail).append("</report_detail>");
 
         return re.toString();
     }

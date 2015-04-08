@@ -54,4 +54,5 @@ public interface ILis extends java.rmi.Remote {
     public void checkLirUser(java.lang.String AUserCode, java.lang.String APassword, javax.xml.rpc.holders.StringHolder AUserName, javax.xml.rpc.holders.StringHolder _return) throws java.rmi.RemoteException;
     public void affirmReceived(java.lang.String AQueueID, boolean downloaded) throws java.rmi.RemoteException;
     public java.lang.String sendLog(java.lang.String SID, java.lang.String opType, java.util.Calendar opTime, java.lang.String opContent) throws java.rmi.RemoteException;
+    public void queryReimbuReport(java.lang.String SID, java.lang.String requestCode, javax.xml.rpc.holders.StringHolder resultInfo, javax.xml.rpc.holders.StringHolder _return) throws java.rmi.RemoteException;
 }

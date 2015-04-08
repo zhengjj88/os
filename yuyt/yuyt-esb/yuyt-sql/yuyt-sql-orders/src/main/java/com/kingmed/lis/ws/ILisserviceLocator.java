@@ -21,39 +21,39 @@ public class ILisserviceLocator extends org.apache.axis.client.Service implement
         super(wsdlLoc, sName);
     }
 
-    // Use to get a proxy class for ilisPort
-    private java.lang.String ilisPort_address = "http://192.168.4.46:60080/SYWS/Lis.dll/soap/ilis";
+    // Use to get a proxy class for ILisPort
+    private java.lang.String ILisPort_address = "http://192.168.4.46:60080/GZWS/Lis.dll/soap/ILis";
 
-    public java.lang.String getilisPortAddress() {
-        return ilisPort_address;
+    public java.lang.String getILisPortAddress() {
+        return ILisPort_address;
     }
 
     // The WSDD service name defaults to the port name.
-    private java.lang.String ilisPortWSDDServiceName = "ilisPort";
+    private java.lang.String ILisPortWSDDServiceName = "ILisPort";
 
-    public java.lang.String getilisPortWSDDServiceName() {
-        return ilisPortWSDDServiceName;
+    public java.lang.String getILisPortWSDDServiceName() {
+        return ILisPortWSDDServiceName;
     }
 
-    public void setilisPortWSDDServiceName(java.lang.String name) {
-        ilisPortWSDDServiceName = name;
+    public void setILisPortWSDDServiceName(java.lang.String name) {
+        ILisPortWSDDServiceName = name;
     }
 
-    public com.kingmed.lis.ws.ILis getilisPort() throws javax.xml.rpc.ServiceException {
+    public com.kingmed.lis.ws.ILis getILisPort() throws javax.xml.rpc.ServiceException {
        java.net.URL endpoint;
         try {
-            endpoint = new java.net.URL(ilisPort_address);
+            endpoint = new java.net.URL(ILisPort_address);
         }
         catch (java.net.MalformedURLException e) {
             throw new javax.xml.rpc.ServiceException(e);
         }
-        return getilisPort(endpoint);
+        return getILisPort(endpoint);
     }
 
-    public com.kingmed.lis.ws.ILis getilisPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
+    public com.kingmed.lis.ws.ILis getILisPort(java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
         try {
             com.kingmed.lis.ws.ILisbindingStub _stub = new com.kingmed.lis.ws.ILisbindingStub(portAddress, this);
-            _stub.setPortName(getilisPortWSDDServiceName());
+            _stub.setPortName(getILisPortWSDDServiceName());
             return _stub;
         }
         catch (org.apache.axis.AxisFault e) {
@@ -61,8 +61,8 @@ public class ILisserviceLocator extends org.apache.axis.client.Service implement
         }
     }
 
-    public void setilisPortEndpointAddress(java.lang.String address) {
-        ilisPort_address = address;
+    public void setILisPortEndpointAddress(java.lang.String address) {
+        ILisPort_address = address;
     }
 
     /**
@@ -73,8 +73,8 @@ public class ILisserviceLocator extends org.apache.axis.client.Service implement
     public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
             if (com.kingmed.lis.ws.ILis.class.isAssignableFrom(serviceEndpointInterface)) {
-                com.kingmed.lis.ws.ILisbindingStub _stub = new com.kingmed.lis.ws.ILisbindingStub(new java.net.URL(ilisPort_address), this);
-                _stub.setPortName(getilisPortWSDDServiceName());
+                com.kingmed.lis.ws.ILisbindingStub _stub = new com.kingmed.lis.ws.ILisbindingStub(new java.net.URL(ILisPort_address), this);
+                _stub.setPortName(getILisPortWSDDServiceName());
                 return _stub;
             }
         }
@@ -94,8 +94,8 @@ public class ILisserviceLocator extends org.apache.axis.client.Service implement
             return getPort(serviceEndpointInterface);
         }
         java.lang.String inputPortName = portName.getLocalPart();
-        if ("ilisPort".equals(inputPortName)) {
-            return getilisPort();
+        if ("ILisPort".equals(inputPortName)) {
+            return getILisPort();
         }
         else  {
             java.rmi.Remote _stub = getPort(serviceEndpointInterface);
@@ -113,7 +113,7 @@ public class ILisserviceLocator extends org.apache.axis.client.Service implement
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();
-            ports.add(new javax.xml.namespace.QName("http://10.60.1.193/", "ilisPort"));
+            ports.add(new javax.xml.namespace.QName("http://10.60.1.193/", "ILisPort"));
         }
         return ports.iterator();
     }
@@ -123,8 +123,8 @@ public class ILisserviceLocator extends org.apache.axis.client.Service implement
     */
     public void setEndpointAddress(java.lang.String portName, java.lang.String address) throws javax.xml.rpc.ServiceException {
         
-if ("ilisPort".equals(portName)) {
-            setilisPortEndpointAddress(address);
+if ("ILisPort".equals(portName)) {
+            setILisPortEndpointAddress(address);
         }
         else 
 { // Unknown Port Name

@@ -26,6 +26,12 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
     <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
         <property name="brokerURL" value="${mq_url}"/>
     </bean>
+    <!-- ################################################################ -->
+    <!-- 消息队列YUYT对应URL -->
+    <bean id="activemq-tat" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="brokerURL" value="${mq-tat_url}"/>
+    </bean>
+    <!-- ################################################################ -->
     <bean id = "hospitalCache" class="com.kingmed.yuyt.cache.HospitalCache"  init-method="init">
         <property name="dataSource" ref="yuytDataSource"/>
     </bean>
@@ -46,6 +52,10 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
         <property name="lisClientCache" ref="lisClientCache"/>
     </bean>
     <bean id="specimenResponseBean" class="com.kingmed.yuyt.bean.SpecimenResponseBean"/>
+    <!-- ################################################################ -->
+    <!-- 消息队列YUYT对应BEAN -->
+    <bean id="specimenStatusResponseBean" class="com.kingmed.yuyt.bean.SpecimenStatusResponseBean" />
+    <!-- ################################################################ -->
     <bean id="reportBean" class="com.kingmed.yuyt.bean.ReportBean">
         <property name="lisClientCache" ref="lisClientCache"/>
     </bean>
@@ -218,5 +228,17 @@ http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/ac
             <to uri="sql:{{sql.markSMSStatus}}" />
             <log message="阳性召回短信息的返回值，处理完毕,${body}"/>
         </route>
+        <!-- ################################################################ -->
+		<!-- 从LIR消息队列YUYT接收标本检测时间并更新标本状态 -->
+		<route id="updateSpecStatus-route">
+			<from uri="activemq-tat:queue:YUYT" />
+			<to uri="bean:specimenStatusResponseBean" />
+			<when>
+				<simple>${body[type]} == '1' and ${body[km_barcode_length]} >= 1</simple>
+				<to uri="sql:{{sql.updateSpecStatus}}" />
+				<log message="更新标本检测状态的返回值，处理完毕,${body}" />
+			</when>
+		</route>
+        <!-- ################################################################ -->
     </camelContext>
 </blueprint>

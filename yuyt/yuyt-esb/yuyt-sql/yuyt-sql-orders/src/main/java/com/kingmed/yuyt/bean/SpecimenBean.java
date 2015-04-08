@@ -127,7 +127,7 @@ public class SpecimenBean implements Processor {
         patientInfoXml += "<CreateDate>" + registrationtimeStr + "</CreateDate>";     // 2013-09-03 11:00:58
         patientInfoXml += "<Remark/>";
         patientInfoXml += "<RequestCode>" + kmbarcode + "</RequestCode>";
-        patientInfoXml += "<HospSampleID>" + kmbarcode + "</HospSampleID>";
+        patientInfoXml += "<HospSampleID>" + hospitalbarcode + "</HospSampleID>";
         patientInfoXml += "<HospSampleNumber></HospSampleNumber>";
         patientInfoXml += "<PatientNumber>" + kmbarcode + "</PatientNumber>";
         patientInfoXml += "<BedNumber></BedNumber>";
