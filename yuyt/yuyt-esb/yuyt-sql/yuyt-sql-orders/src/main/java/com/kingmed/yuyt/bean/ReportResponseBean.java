@@ -141,19 +141,37 @@ public class ReportResponseBean implements Processor {
         return re;
     }
 
-    private String checkPositive4CP(Document doc, String expResult) {// 细胞病理检测项目
-        String result;
-        result = doc.selectSingleNode(expResult).getText();
-        if (result.contains("ASCUS")
-                || result.contains("AGUS")
-                || result.contains("ASC-H")
-                || result.contains("LSIL")
-                || result.contains("HSIL")
-                || result.contains("CA")
-                || result.contains("CIN")) {
-            return Constants.POSITIVE_Y;
-        } else {
-            return Constants.POSITIVE_X;
-        }
-    }
+    /**
+     * @author spike
+     * @date 2015/04/13
+     * @desc 检查细胞病理检测项目是否为阳性
+     */
+	private String checkPositive4CP(Document doc, String expResult) {
+		String result = Constants.EMPTY_STR;
+		result = doc.selectSingleNode(expResult).getText();
+
+		/**
+		 * 筛选关键字
+		 * 原有 (ASCUS/AGUS/ASC-H/LSIL/HSIL/CA/CIN)
+		 * 新增 (非典型鳞状细胞/上皮内低度病变/上皮内高度病变/非典型腺细胞/腺癌/鳞状细胞癌)
+		 */
+		if (result.contains("ASCUS")
+				|| result.contains("AGUS")
+				|| result.contains("ASC-H")
+				|| result.contains("LSIL")
+				|| result.contains("HSIL")
+				|| result.contains("CA")
+				|| result.contains("CIN")
+				|| result.contains("非典型鳞状细胞")
+				|| result.contains("上皮内低度病变")
+				|| result.contains("上皮内高度病变")
+				|| result.contains("非典型腺细胞")
+				|| result.contains("腺癌")
+				|| result.contains("鳞状细胞癌")) {
+			return Constants.POSITIVE_Y;
+		} else {
+			return Constants.POSITIVE_N;
+		}
+	}
+
 }

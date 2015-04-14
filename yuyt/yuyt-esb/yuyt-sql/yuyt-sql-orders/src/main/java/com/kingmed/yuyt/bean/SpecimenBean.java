@@ -106,6 +106,18 @@ public class SpecimenBean implements Processor {
 
         companycode = companycode.toUpperCase().replace(Constants.PRE_COMPANY_CODE, "");
         hospitalcode = hospitalcode.toUpperCase().replace(Constants.PRE_HOSPTITAL_CODE, "");
+        
+        /**
+         * @desc 获取标本病人电话
+         * 开始编辑
+         */
+		String patientTel = (String) spec.get("item_p_mobileno");
+		if (patientTel == null) {
+			patientTel = Constants.EMPTY_STR;
+		}
+        /**
+         * 结束编辑
+         */
 
         // LIS系统要求传入年龄参数。
         String age = getAge(borndate);
@@ -136,7 +148,15 @@ public class SpecimenBean implements Processor {
         patientInfoXml += "<Sex>" + sexStr + "</Sex>";
         patientInfoXml += "<Age>" + age + "</Age>";
         patientInfoXml += "<AgeUnit>" + ageUnit + "</AgeUnit>";
-        patientInfoXml += "<PatientTel/>";
+		/**
+		 * @desc 报文添加标本病人电话
+		 * 开始编辑
+		 */
+		// patientInfoXml += "<PatientTel/>";
+		patientInfoXml += "<PatientTel>" + patientTel + "</PatientTel>";
+		/**
+		 * 结束编辑
+		 */
         patientInfoXml += "<SectionOffice></SectionOffice>";
         patientInfoXml += "<Dcotor></Dcotor>";
         patientInfoXml += "<DcotorTel/>";

@@ -82,7 +82,7 @@ public class SpecimenStatusResponseBean implements Processor {
 		beginIndex = record.indexOf(KM_BARCODE_BEGIN);
 		endIndex = record.indexOf(KM_BARCODE_END);
 		if (beginIndex > NOT_MATCH && endIndex > NOT_MATCH && endIndex > beginIndex) {
-			kmBarcode = record.substring(beginIndex + KM_BARCODE_BEGIN.length(), endIndex);
+			kmBarcode = record.substring(beginIndex + KM_BARCODE_BEGIN.length(), endIndex).trim();
 		}
 
 		// 解析检测项目代码
@@ -103,7 +103,7 @@ public class SpecimenStatusResponseBean implements Processor {
 		beginIndex = record.indexOf(TYPE_BEGIN);
 		endIndex = record.indexOf(TYPE_END);
 		if (beginIndex > NOT_MATCH && endIndex > NOT_MATCH && endIndex > beginIndex) {
-			type = record.substring(beginIndex + TYPE_BEGIN.length(), endIndex);
+			type = record.substring(beginIndex + TYPE_BEGIN.length(), endIndex).trim();
 		}
 
 		// 解析TAT时间

@@ -117,5 +117,10 @@ public class Constants {
 	public static final String STATUS_NOT_CHECK = "0";
 	// 检测中
 	public static final String STATUS_CHECKING = "1";
+	
+	/**
+	 * 空字符串常量
+	 */
+	public static final String EMPTY_STR = "";
         
 }
